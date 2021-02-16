@@ -57,6 +57,7 @@ public interface ILineDataSet extends ILineRadarDataSet<Entry> {
      * @return
      */
     int getCircleColorCount();
+    int getCircleHoleColorCount();
 
     /**
      * Returns true if drawing circles for this DataSet is enabled, false if not
@@ -68,9 +69,10 @@ public interface ILineDataSet extends ILineRadarDataSet<Entry> {
     /**
      * Returns the color of the inner circle (the circle-hole).
      *
+     * @param index
      * @return
      */
-    int getCircleHoleColor();
+    int getCircleHoleColor(int index);
 
     /**
      * Returns true if drawing the circle-holes is enabled, false if not.
@@ -78,6 +80,7 @@ public interface ILineDataSet extends ILineRadarDataSet<Entry> {
      * @return
      */
     boolean isDrawCircleHoleEnabled();
+    boolean isDrawCirclesAsRectangles();
 
     /**
      * Returns the DashPathEffect that is used for drawing the lines.

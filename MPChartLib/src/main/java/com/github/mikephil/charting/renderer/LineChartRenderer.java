@@ -630,7 +630,7 @@ public class LineChartRenderer extends LineRadarRenderer {
                     dataSet.getEntryCount() == 0)
                 continue;
 
-            mCirclePaintInner.setColor(dataSet.getCircleHoleColor());
+            // mCirclePaintInner.setColor(dataSet.getCircleHoleColor());
 
             Transformer trans = mChart.getTransformer(dataSet.getAxisDependency());
 
@@ -642,7 +642,8 @@ public class LineChartRenderer extends LineRadarRenderer {
                     circleHoleRadius < circleRadius &&
                     circleHoleRadius > 0.f;
             boolean drawTransparentCircleHole = drawCircleHole &&
-                    dataSet.getCircleHoleColor() == ColorTemplate.COLOR_NONE;
+                    dataSet.getCircleHoleColor(0) == ColorTemplate.COLOR_NONE;
+            boolean drawCirclesAsRectangles = dataSet.isDrawCirclesAsRectangles();
 
             DataSetImageCache imageCache;
 
@@ -657,7 +658,7 @@ public class LineChartRenderer extends LineRadarRenderer {
 
             // only fill the cache with new bitmaps if a change is required
             if (changeRequired) {
-                imageCache.fill(dataSet, drawCircleHole, drawTransparentCircleHole);
+                imageCache.fill(dataSet, drawCircleHole, drawTransparentCircleHole, drawCirclesAsRectangles);
             }
 
             int boundsRangeCount = mXBounds.range + mXBounds.min;
@@ -769,7 +770,14 @@ public class LineChartRenderer extends LineRadarRenderer {
          */
         protected boolean init(ILineDataSet set) {
 
-            int size = set.getCircleColorCount();
+            int size = 0;
+            int sizeColors = set.getCircleColorCount();
+            int sizeHoleColors = set.getCircleHoleColorCount();
+            if(sizeColors >= sizeHoleColors) {
+                size = sizeColors;
+            } else {
+                size = sizeHoleColors;
+            }
             boolean changeRequired = false;
 
             if (circleBitmaps == null) {
@@ -790,13 +798,20 @@ public class LineChartRenderer extends LineRadarRenderer {
          * @param drawCircleHole
          * @param drawTransparentCircleHole
          */
-        protected void fill(ILineDataSet set, boolean drawCircleHole, boolean drawTransparentCircleHole) {
+        protected void fill(ILineDataSet set, boolean drawCircleHole, boolean drawTransparentCircleHole, boolean drawCirclesAsRectangles) {
 
-            int colorCount = set.getCircleColorCount();
+            int count = 0;
+            int countColors = set.getCircleColorCount();
+            int countHoleColors = set.getCircleHoleColorCount();
+            if(countColors >= countHoleColors) {
+                count = countColors;
+            } else {
+                count = countHoleColors;
+            }
             float circleRadius = set.getCircleRadius();
             float circleHoleRadius = set.getCircleHoleRadius();
 
-            for (int i = 0; i < colorCount; i++) {
+            for (int i = 0; i < count; i++) {
 
                 Bitmap.Config conf = Bitmap.Config.ARGB_4444;
                 Bitmap circleBitmap = Bitmap.createBitmap((int) (circleRadius * 2.1), (int) (circleRadius * 2.1), conf);
@@ -804,6 +819,7 @@ public class LineChartRenderer extends LineRadarRenderer {
                 Canvas canvas = new Canvas(circleBitmap);
                 circleBitmaps[i] = circleBitmap;
                 mRenderPaint.setColor(set.getCircleColor(i));
+                mCirclePaintInner.setColor(set.getCircleHoleColor(i));
 
                 if (drawTransparentCircleHole) {
                     // Begin path for circle with hole
@@ -825,19 +841,38 @@ public class LineChartRenderer extends LineRadarRenderer {
                     // Fill in-between
                     canvas.drawPath(mCirclePathBuffer, mRenderPaint);
                 } else {
-
-                    canvas.drawCircle(
+                    // TODO: to be reimplemented - look into LineDataSet.java for more info
+                    if(drawCirclesAsRectangles) {
+                        canvas.drawRect(
+                            0,
+                            0,
+                            circleRadius*2,
+                            circleRadius*2,
+                            mRenderPaint);
+                    } else {
+                        canvas.drawCircle(
                             circleRadius,
                             circleRadius,
                             circleRadius,
                             mRenderPaint);
+                    }
 
                     if (drawCircleHole) {
-                        canvas.drawCircle(
+                        // TODO: to be reimplemented - look into LineDataSet.java for more info
+                        if(drawCirclesAsRectangles) {
+                            canvas.drawRect(
+                                (circleRadius - circleHoleRadius),
+                                (circleRadius - circleHoleRadius),
+                                circleHoleRadius*2 + (circleRadius - circleHoleRadius),
+                                circleHoleRadius*2 + (circleRadius - circleHoleRadius),
+                                mCirclePaintInner);
+                        } else {
+                            canvas.drawCircle(
                                 circleRadius,
                                 circleRadius,
                                 circleHoleRadius,
                                 mCirclePaintInner);
+                        }
                     }
                 }
             }

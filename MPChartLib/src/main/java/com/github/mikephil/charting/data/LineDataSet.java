@@ -28,9 +28,14 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
     private List<Integer> mCircleColors = null;
 
     /**
+     * List representing all colors that are used for the circles
+     */
+    private List<Integer> mCircleHoleColors = null;
+
+    /**
      * the color of the inner circles
      */
-    private int mCircleHoleColor = Color.WHITE;
+    // private int mCircleHoleColor = Color.WHITE;
 
     /**
      * the radius of the circle-shaped value indicators
@@ -64,6 +69,13 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
 
     private boolean mDrawCircleHole = true;
 
+    /**
+     * if true, drawing rectangles instead of circles
+     * IMPORTANT: counting circle radius as half of a size of a rectandle side in this case
+     * TODO: this should be reimplemented to use general size settings and SHAPES probably
+     */
+    private boolean mDrawCirclesAsRectangles = false;
+
 
     public LineDataSet(List<Entry> yVals, String label) {
         super(yVals, label);
@@ -75,11 +87,16 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
             mCircleColors = new ArrayList<Integer>();
         }
         mCircleColors.clear();
+        if (mCircleHoleColors == null) {
+            mCircleHoleColors = new ArrayList<Integer>();
+        }
+        mCircleHoleColors.clear();
 
         // default colors
         // mColors.add(Color.rgb(192, 255, 140));
         // mColors.add(Color.rgb(255, 247, 140));
         mCircleColors.add(Color.rgb(140, 234, 255));
+        mCircleHoleColors.add(Color.rgb(255, 255, 255));
     }
 
     @Override
@@ -96,13 +113,14 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
     protected void copy(LineDataSet lineDataSet) {
         super.copy(lineDataSet);
         lineDataSet.mCircleColors = mCircleColors;
-        lineDataSet.mCircleHoleColor = mCircleHoleColor;
+        lineDataSet.mCircleHoleColors = mCircleHoleColors;
         lineDataSet.mCircleHoleRadius = mCircleHoleRadius;
         lineDataSet.mCircleRadius = mCircleRadius;
         lineDataSet.mCubicIntensity = mCubicIntensity;
         lineDataSet.mDashPathEffect = mDashPathEffect;
         lineDataSet.mDrawCircleHole = mDrawCircleHole;
         lineDataSet.mDrawCircles = mDrawCircleHole;
+        lineDataSet.mDrawCirclesAsRectangles = mDrawCirclesAsRectangles;
         lineDataSet.mFillFormatter = mFillFormatter;
         lineDataSet.mMode = mMode;
     }
@@ -281,7 +299,8 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
 
     @Override
     public int getCircleColor(int index) {
-        return mCircleColors.get(index);
+        int newIndex = index % mCircleColors.size();
+        return mCircleColors.get(newIndex);
     }
 
     @Override
@@ -340,6 +359,51 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
         mCircleColors = clrs;
     }
 
+    /** ALL CODE BELOW RELATED TO CIRCLE-HOLE-COLORS */
+
+    /**
+     * returns all hole-colors specified for the circles
+     *
+     * @return
+     */
+    public List<Integer> getCircleHoleColors() {
+        return mCircleHoleColors;
+    }
+
+    @Override
+    public int getCircleHoleColor(int index) {
+        int newIndex = index % mCircleHoleColors.size();
+        return mCircleHoleColors.get(newIndex);
+    }
+
+    @Override
+    public int getCircleHoleColorCount() {
+        return mCircleHoleColors.size();
+    }
+
+    public void setCircleHoleColors(List<Integer> colors) {
+        mCircleHoleColors = colors;
+    }
+
+    public void setCircleHoleColors(int... colors) {
+        this.mCircleHoleColors = ColorTemplate.createColors(colors);
+    }
+
+    public void setCircleHoleColors(int[] colors, Context c) {
+
+        List<Integer> clrs = mCircleHoleColors;
+        if (clrs == null) {
+            clrs = new ArrayList<>();
+        }
+        clrs.clear();
+
+        for (int color : colors) {
+            clrs.add(c.getResources().getColor(color));
+        }
+
+        mCircleHoleColors = clrs;
+    }
+
     /**
      * Sets the one and ONLY color that should be used for this DataSet.
      * Internally, this recreates the colors array and adds the specified color.
@@ -362,17 +426,23 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
     }
 
     /**
+     * resets the circle-hole-colors array and creates a new one
+     */
+    public void resetCircleHoleColors() {
+        if (mCircleHoleColors == null) {
+            mCircleHoleColors = new ArrayList<Integer>();
+        }
+        mCircleHoleColors.clear();
+    }
+
+    /**
      * Sets the color of the inner circle of the line-circles.
      *
      * @param color
      */
     public void setCircleHoleColor(int color) {
-        mCircleHoleColor = color;
-    }
-
-    @Override
-    public int getCircleHoleColor() {
-        return mCircleHoleColor;
+        resetCircleHoleColors();
+        mCircleHoleColors.add(color);
     }
 
     /**
@@ -382,6 +452,20 @@ public class LineDataSet extends LineRadarDataSet<Entry> implements ILineDataSet
      */
     public void setDrawCircleHole(boolean enabled) {
         mDrawCircleHole = enabled;
+    }
+
+    /**
+     * Set this to true to allow drawing a square instead of a circle.
+     *
+     * @param enabled
+     */
+    public void setDrawCirclesAsRectangles(boolean enabled) {
+        mDrawCirclesAsRectangles = enabled;
+    }
+
+    @Override
+    public boolean isDrawCirclesAsRectangles() {
+        return mDrawCirclesAsRectangles;
     }
 
     @Override
