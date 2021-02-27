@@ -61,4 +61,26 @@ public interface IBarDataSet extends IBarLineScatterCandleBubbleDataSet<BarEntry
      * @return
      */
     String[] getStackLabels();
+
+    /**
+     * Returns the width used for drawing highlight above the selected bar.
+     * If width == 0, no line will be drawn.
+     *
+     * @return
+     */
+    float getHighlightLineWidth();
+
+    /**
+     * Returns the color drawing highlight line above a selected bar.
+     *
+     * @return
+     */
+    int getHighlightLineColor();
+
+    /**
+     * Returns the bottom inset used for drawing highlight above the selected bar.
+     *
+     * @return
+     */
+    float getHighlightLineBottomMargin();
 }

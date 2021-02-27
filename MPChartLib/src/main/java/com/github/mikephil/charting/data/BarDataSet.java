@@ -25,6 +25,10 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
 
     private int mBarBorderColor = Color.BLACK;
 
+    private int mHighlightLineColor = Color.BLACK;
+    private float mHighlightLineWidth = 2.0f;
+    private float mHighlightLineBottomMargin = 2.0f;
+
     /**
      * the alpha value used to draw the highlight indicator bar
      */
@@ -69,6 +73,9 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
         barDataSet.mBarBorderWidth = mBarBorderWidth;
         barDataSet.mStackLabels = mStackLabels;
         barDataSet.mHighLightAlpha = mHighLightAlpha;
+        barDataSet.mHighlightLineColor = mHighlightLineColor;
+        barDataSet.mHighlightLineWidth = mHighlightLineWidth;
+        barDataSet.mHighlightLineBottomMargin = mHighlightLineBottomMargin;
     }
 
     /**
@@ -204,6 +211,65 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
     @Override
     public int getBarBorderColor() {
         return mBarBorderColor;
+    }
+
+    /**
+     * Sets the color drawing highlight line above the selected bars.
+     *
+     * @return
+     */
+    public void setHighlightLineColor(int color) {
+        mHighlightLineColor = color;
+    }
+
+    /**
+     * Returns the color drawing hightlight line above the bars.
+     *
+     * @return
+     */
+    @Override
+    public int getHighlightLineColor() {
+        return mHighlightLineColor;
+    }
+
+    /**
+     * Sets the width used for drawing lines above the bars.
+     * If width == 0, no line will be drawn.
+     *
+     * @return
+     */
+    public void setHighlightLineWidth(float width) {
+        mHighlightLineWidth = width;
+    }
+
+    /**
+     * Returns the width used for drawing lines above the bars.
+     * If width == 0, no line will be drawn.
+     *
+     * @return
+     */
+    @Override
+    public float getHighlightLineWidth() {
+        return mHighlightLineWidth;
+    }
+
+    /**
+     * Sets the bottom inset used for drawing line above the bars.
+     *
+     * @return
+     */
+    public void setHighlightLineBottomMargin(float inset) {
+        mHighlightLineBottomMargin = inset;
+    }
+
+    /**
+     * Returns the bottom inset used for drawing line above the bars.
+     *
+     * @return
+     */
+    @Override
+    public float getHighlightLineBottomMargin() {
+        return mHighlightLineBottomMargin;
     }
 
     /**
