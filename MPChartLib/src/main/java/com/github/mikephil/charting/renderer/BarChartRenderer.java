@@ -535,6 +535,7 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
         // set color and stroke-width
         mHighlightPaint.setColor(set.getHighlightLineColor());
         mHighlightPaint.setStrokeWidth(set.getHighlightLineWidth());
+        mHighlightPaint.setAlpha(set.getHighLightLineAlpha());
         c.drawLine(x, mViewPortHandler.contentTop(), x, bar.top - set.getHighlightLineBottomMargin(), mHighlightPaint);
     }
 }

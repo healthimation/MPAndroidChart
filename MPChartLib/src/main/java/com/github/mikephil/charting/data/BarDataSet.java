@@ -33,6 +33,11 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
      * the alpha value used to draw the highlight indicator bar
      */
     private int mHighLightAlpha = 120;
+    /**
+     * the alpha value used to draw the highlight line indicator bar
+     */
+    private int mHighLightLineAlpha = 120;
+
 
     /**
      * the overall entry count, including counting each stack-value individually
@@ -73,6 +78,7 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
         barDataSet.mBarBorderWidth = mBarBorderWidth;
         barDataSet.mStackLabels = mStackLabels;
         barDataSet.mHighLightAlpha = mHighLightAlpha;
+        barDataSet.mHighLightLineAlpha = mHighLightLineAlpha;
         barDataSet.mHighlightLineColor = mHighlightLineColor;
         barDataSet.mHighlightLineWidth = mHighlightLineWidth;
         barDataSet.mHighlightLineBottomMargin = mHighlightLineBottomMargin;
@@ -285,6 +291,21 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
     @Override
     public int getHighLightAlpha() {
         return mHighLightAlpha;
+    }
+
+    /**
+     * Set the alpha value (transparency) that is used for drawing the highlight
+     * line indicator bar. min = 0 (fully transparent), max = 255 (fully opaque)
+     *
+     * @param alpha
+     */
+    public void setHighLightLineAlpha(int alpha) {
+        mHighLightLineAlpha = alpha;
+    }
+
+    @Override
+    public int getHighLightLineAlpha() {
+        return mHighLightLineAlpha;
     }
 
     /**
