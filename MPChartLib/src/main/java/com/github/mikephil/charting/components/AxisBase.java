@@ -69,6 +69,8 @@ public abstract class AxisBase extends ComponentBase {
      */
     protected boolean mGranularityEnabled = false;
 
+    protected boolean mDisableIntervalNormalization = false;
+
     /**
      * if true, the set number of y-labels will be forced
      */
@@ -365,6 +367,10 @@ public abstract class AxisBase extends ComponentBase {
         return mGranularityEnabled;
     }
 
+    public boolean getDisableIntervalNormalization() {
+        return mDisableIntervalNormalization;
+    }
+
     /**
      * Enabled/disable granularity control on axis value intervals. If enabled, the axis
      * interval is not allowed to go below a certain granularity. Default: false
@@ -373,6 +379,10 @@ public abstract class AxisBase extends ComponentBase {
      */
     public void setGranularityEnabled(boolean enabled) {
         mGranularityEnabled = enabled;
+    }
+
+    public void setDisableIntervalNormalization(boolean disabled) {
+        mDisableIntervalNormalization = disabled;
     }
 
     /**
