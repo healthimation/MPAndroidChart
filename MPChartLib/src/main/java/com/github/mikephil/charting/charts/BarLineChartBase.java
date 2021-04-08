@@ -365,13 +365,16 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
         // calculate axis range (min / max) according to provided data
 
-        if (mAxisLeft.isEnabled())
-            mAxisLeft.calculate(mData.getYMin(AxisDependency.LEFT),
-                    mData.getYMax(AxisDependency.LEFT));
+        // if (mAxisLeft.isEnabled())
+        //     mAxisLeft.calculate(mData.getYMin(AxisDependency.LEFT),
+        //             mData.getYMax(AxisDependency.LEFT));
 
-        if (mAxisRight.isEnabled())
-            mAxisRight.calculate(mData.getYMin(AxisDependency.RIGHT),
-                    mData.getYMax(AxisDependency.RIGHT));
+        // if (mAxisRight.isEnabled())
+        //     mAxisRight.calculate(mData.getYMin(AxisDependency.RIGHT),
+        //             mData.getYMax(AxisDependency.RIGHT));
+
+        mAxisLeft.calculate(mData.getYMin(AxisDependency.LEFT), mData.getYMax(AxisDependency.LEFT));
+        mAxisRight.calculate(mData.getYMin(AxisDependency.RIGHT), mData.getYMax(AxisDependency.RIGHT));
 
         calculateOffsets();
     }
