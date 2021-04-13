@@ -15,6 +15,7 @@ import android.view.accessibility.AccessibilityEvent;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
+import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.accessibility.ExploreByTouchHelper;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -25,9 +26,12 @@ import com.github.mikephil.charting.highlight.BarHighlighter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.renderer.BarChartRenderer;
+import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -396,10 +400,12 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
 
         private CharSequence getDescriptionForIndex(int index) {
             if (mData != null) {
-                return "accessibility label";
+                int dataSetIndex = getDataSetIndex(index);
+                int entryIndex = getEntryIndex(dataSetIndex, index);
+                BarEntry e = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
+                return e.getAccessibilityLabel();
             }
-            return "some empty text";
-
+            return "accessibility label";
         }
 
         @Override
