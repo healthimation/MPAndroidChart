@@ -1,6 +1,7 @@
 package com.github.mikephil.charting.formatter;
 
 import java.text.DecimalFormat;
+import java.lang.Math;
 
 /**
  * Predefined value-formatter that formats large numbers in a pretty way.
@@ -64,23 +65,22 @@ public class LargeValueFormatter extends ValueFormatter
         this.mMaxLength = maxLength;
     }
 
-    /**
-     * Formats each number properly. Special thanks to Roman Gromov
-     * (https://github.com/romangromov) for this piece of code.
-     */
     private String makePretty(double number) {
 
-        String r = mFormat.format(number);
+        double sig = Math.abs(number);
+        String sign = number < 0 ? "-" : "";
+        int length = 0;
 
-        int numericValue1 = Character.getNumericValue(r.charAt(r.length() - 1));
-        int numericValue2 = Character.getNumericValue(r.charAt(r.length() - 2));
-        int combined = Integer.valueOf(numericValue2 + "" + numericValue1);
-
-        r = r.replaceAll("E[0-9][0-9]", mSuffix[combined / 3]);
-
-        while (r.length() > mMaxLength || r.matches("[0-9]+\\.[a-z]")) {
-            r = r.substring(0, r.length() - 2) + r.substring(r.length() - 1);
+        while(sig >= 1000.0 && length < mSuffix.length) {
+            sig /= 1000.0;
+            length += 1;
         }
+
+        DecimalFormat format = new DecimalFormat();
+        format.setMaximumFractionDigits(3);
+        format.setMinimumFractionDigits(0);
+
+        String r = sign + format.format(sig) + mSuffix[length];
 
         return r;
     }
