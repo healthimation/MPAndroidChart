@@ -215,7 +215,7 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
     }
 
     public int getEntryIndex(int dataSetIndex, int index) {
-        int size = 0;
+        int size = -1;
         if (dataSetIndex == 0) return index;
         for (int i = 0; i <= dataSetIndex; i++) {
             size += ((BarDataSet)mData.getDataSets().get(i)).getValues().size() - i;
