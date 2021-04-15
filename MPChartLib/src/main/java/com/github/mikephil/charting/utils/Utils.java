@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Layout;
@@ -350,8 +351,8 @@ public abstract class Utils {
      */
     public static float roundToNextSignificant(double number) {
         if (Double.isInfinite(number) ||
-            Double.isNaN(number) ||
-            number == 0.0)
+                Double.isNaN(number) ||
+                number == 0.0)
             return 0;
 
         final float d = (float) Math.ceil((float) Math.log10(number < 0 ? -number : number));
@@ -771,5 +772,14 @@ public abstract class Utils {
 
     public static int getSDKInt() {
         return android.os.Build.VERSION.SDK_INT;
+    }
+
+    public static Rect rectFtoRect(RectF rectF) {
+        Rect rect = new Rect();
+        rect.left = (int) rectF.left;
+        rect.right = (int) rectF.right;
+        rect.top = (int) rectF.top;
+        rect.bottom = (int) rectF.bottom;
+        return rect;
     }
 }
