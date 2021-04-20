@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
@@ -26,12 +27,9 @@ import com.github.mikephil.charting.highlight.BarHighlighter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.renderer.BarChartRenderer;
-import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -218,7 +216,7 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
         int size = -1;
         if (dataSetIndex == 0) return index;
         for (int i = 0; i <= dataSetIndex; i++) {
-            size += ((BarDataSet)mData.getDataSets().get(i)).getValues().size() - i;
+            size += ((BarDataSet)mData.getDataSets().get(i)).getValues().size();
         }
 
         return size - index;
@@ -398,11 +396,12 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
 
         }
 
-        private CharSequence getDescriptionForIndex(int index) {
+        private CharSequence getDescriptionForIndex(int index, AccessibilityNodeInfoCompat node) {
             if (mData != null) {
                 int dataSetIndex = getDataSetIndex(index);
                 int entryIndex = getEntryIndex(dataSetIndex, index);
                 BarEntry e = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
+                node.setSelected(valuesToHighlight() && getHighlighted()[0].getX() == e.getX());
                 return e.getAccessibilityLabel();
             }
             return "accessibility label";
@@ -410,7 +409,7 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
 
         @Override
         protected void populateEventForVirtualViewId(int virtualViewId, AccessibilityEvent event) {
-            final CharSequence desc = getDescriptionForIndex(virtualViewId);
+            final CharSequence desc = getDescriptionForIndex(virtualViewId, AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId));
             event.setContentDescription(desc);
         }
 
@@ -418,7 +417,7 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
         protected void populateNodeForVirtualViewId(
                 int virtualViewId, AccessibilityNodeInfoCompat node) {
             // Node and event descriptions are usually identical.
-            final CharSequence desc = getDescriptionForIndex(virtualViewId);
+            final CharSequence desc = getDescriptionForIndex(virtualViewId, node);
             node.setContentDescription(desc);
 
             // Since the user can tap a bar, add the CLICK action.
@@ -429,6 +428,7 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
             node.setBoundsInParent(bounds);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
         @Override
         protected boolean performActionForVirtualViewId(
                 int virtualViewId, int action, Bundle arguments) {
@@ -441,6 +441,9 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
                         Highlight high = new Highlight(entry.getX(), entry.getY(), 0);
                         highlightValue(high);
                         mSelectionListener.onValueSelected(entry, high);
+                        AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId);
+                        CharSequence accessibilityLabel = getDescriptionForIndex(virtualViewId, node);
+                        getRootView().announceForAccessibility(R.string.selected + ", " + accessibilityLabel);
                         return true;
                 }
             }
