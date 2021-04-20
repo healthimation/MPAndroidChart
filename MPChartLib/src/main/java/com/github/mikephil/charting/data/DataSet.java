@@ -75,6 +75,26 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
     }
 
     @Override
+    public boolean containsEntriesAtXValue(float fromX, float toX) {
+
+        if (mValues == null || mValues.isEmpty()) {
+            return false;
+        }
+
+        for(int i = 0; i < mValues.size(); i++) {
+
+          Entry entry = mValues.get(i);
+          float entryX = entry.getX();
+
+          if((entryX >= fromX) && (entryX <= toX)) {
+            return true;
+          }
+        }
+
+        return false;
+    }
+
+    @Override
     public void calcMinMaxY(float fromX, float toX) {
 
         if (mValues == null || mValues.isEmpty())
@@ -366,7 +386,7 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
                     if (value.getX() != closestXValue)
                         break;
 
-                    if (Math.abs(value.getY() - closestToY) < Math.abs(closestYValue - closestToY)) {
+                    if (Math.abs(value.getY() - closestToY) <= Math.abs(closestYValue - closestToY)) {
                         closestYValue = closestToY;
                         closestYIndex = closest;
                     }
