@@ -103,6 +103,8 @@ public interface IDataSet<T extends Entry> {
      */
     T getEntryForXValue(float xValue, float closestToY);
 
+    boolean containsEntriesAtXValue(float fromX, float toX);
+
     /**
      * Returns all Entry objects found at the given x-value with binary
      * search. An empty array if no Entry object at that x-value.
