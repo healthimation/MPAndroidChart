@@ -15,6 +15,19 @@ import com.github.mikephil.charting.renderer.LineChartRenderer;
  */
 public class LineChart extends BarLineChartBase<LineData> implements LineDataProvider {
 
+    /**
+     * flag that indicates if group selection is on
+     */
+    protected boolean mGroupSelectionEnabled = false;
+
+    public void setGroupSelectionEnabled(boolean enabled) {
+        mGroupSelectionEnabled = enabled;
+    }
+
+    public boolean isGroupSelectionEnabled() {
+        return mGroupSelectionEnabled;
+    }
+
     public LineChart(Context context) {
         super(context);
     }

@@ -245,14 +245,19 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         if (!mAxisRight.isDrawGridLinesBehindDataEnabled())
             mAxisRendererRight.renderGridLines(canvas);
 
-        // if highlighting is enabled
-        if (valuesToHighlight())
-            mRenderer.drawHighlighted(canvas, mIndicesToHighlight);
+        // TODO: not sure about this should be exactly after drawHighlighted
+        // test it!
+        // drawHighlighted waa here (I suppose for easier highlight line render)
+        // NOTE: we could have two highlights funcs if we want
 
         // Removes clipping rectangle
         canvas.restoreToCount(clipRestoreCount);
 
         mRenderer.drawExtras(canvas);
+
+        // if highlighting is enabled
+        if (valuesToHighlight())
+            mRenderer.drawHighlighted(canvas, mIndicesToHighlight);
 
         if (mXAxis.isEnabled() && !mXAxis.isDrawLimitLinesBehindDataEnabled())
             mXAxisRenderer.renderLimitLines(canvas);

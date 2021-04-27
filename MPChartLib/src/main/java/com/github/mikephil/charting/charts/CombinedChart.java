@@ -33,6 +33,19 @@ public class CombinedChart extends BarLineChartBase<CombinedData> implements Com
      */
     private boolean mDrawValueAboveBar = true;
 
+    /**
+     * flag that indicates if group selection is on
+     */
+    protected boolean mGroupSelectionEnabled = false;
+
+    public void setGroupSelectionEnabled(boolean enabled) {
+        mGroupSelectionEnabled = enabled;
+    }
+
+    public boolean isGroupSelectionEnabled() {
+        return mGroupSelectionEnabled;
+    }
+
 
     /**
      * flag that indicates whether the highlight should be full-bar oriented, or single-value?

@@ -6,6 +6,7 @@ import com.github.mikephil.charting.data.LineData;
 public interface LineDataProvider extends BarLineScatterCandleBubbleDataProvider {
 
     LineData getLineData();
+    boolean isGroupSelectionEnabled();
 
     YAxis getAxis(YAxis.AxisDependency dependency);
 }
