@@ -116,7 +116,11 @@ public class LineChartRenderer extends LineRadarRenderer {
         if (dataSet.getEntryCount() < 1)
             return;
 
-        mRenderPaint.setStrokeWidth(dataSet.getLineWidth() * scale);
+        float lineWidth = dataSet.getLineWidth() * scale;
+
+        if(lineWidth <= 0.0f) return;
+
+        mRenderPaint.setStrokeWidth(lineWidth);
         mRenderPaint.setPathEffect(dataSet.getDashPathEffect());
 
         switch (dataSet.getMode()) {
