@@ -100,17 +100,18 @@ public class LineChartRenderer extends LineRadarRenderer {
         boolean isMakeUnhighlightedEntriesSmalledEnabled = mChart.isMakeUnhighlightedEntriesSmalledEnabled();
 
         float scale = isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? 0.8f : 1.0f;
+        int alpha = hasValuesToHighlight ? 50 : 255;
 
         for (ILineDataSet set : lineData.getDataSets()) {
 
             if (set.isVisible())
-                drawChartLines(c, set, scale);
+                drawChartLines(c, set, scale, alpha);
         }
 
         c.drawBitmap(drawBitmap, 0, 0, mRenderPaint);
     }
 
-    protected void drawChartLines(Canvas c, ILineDataSet dataSet, float scale) {
+    protected void drawChartLines(Canvas c, ILineDataSet dataSet, float scale, int alpha) {
 
         if (dataSet.getEntryCount() < 1)
             return;
@@ -122,7 +123,7 @@ public class LineChartRenderer extends LineRadarRenderer {
             default:
             case LINEAR:
             case STEPPED:
-                drawLinear(c, dataSet);
+                drawLinear(c, dataSet, alpha);
                 break;
 
             case CUBIC_BEZIER:
@@ -297,7 +298,7 @@ public class LineChartRenderer extends LineRadarRenderer {
      * @param c
      * @param dataSet
      */
-    protected void drawLinear(Canvas c, ILineDataSet dataSet) {
+    protected void drawLinear(Canvas c, ILineDataSet dataSet, int alpha) {
 
         int entryCount = dataSet.getEntryCount();
 
@@ -322,6 +323,7 @@ public class LineChartRenderer extends LineRadarRenderer {
         mXBounds.set(mChart, dataSet);
 
         // if drawing filled is enabled
+        // TODO: add alpha support
         if (dataSet.isDrawFilledEnabled() && entryCount > 0) {
             drawLinearFill(c, dataSet, trans, mXBounds);
         }
@@ -377,6 +379,7 @@ public class LineChartRenderer extends LineRadarRenderer {
 
                 // get the color that is set for this line-segment
                 mRenderPaint.setColor(dataSet.getColor(j));
+                mRenderPaint.setAlpha(alpha);
 
                 canvas.drawLines(mLineBuffer, 0, pointsPerEntryPair * 2, mRenderPaint);
             }
@@ -420,6 +423,7 @@ public class LineChartRenderer extends LineRadarRenderer {
                     final int size = Math.max((mXBounds.range + 1) * pointsPerEntryPair, pointsPerEntryPair) * 2;
 
                     mRenderPaint.setColor(dataSet.getColor());
+                    mRenderPaint.setAlpha(alpha);
 
                     canvas.drawLines(mLineBuffer, 0, size, mRenderPaint);
                 }
@@ -610,9 +614,11 @@ public class LineChartRenderer extends LineRadarRenderer {
 
         List<ILineDataSet> dataSets = mChart.getLineData().getDataSets();
 
+        int alpha = hasValuesToHighlight ? 50 : 255;
+
         for(ILineDataSet dataSet : dataSets) {
             // TODO: add proper scaling logic here
-            drawEntries(c, dataSet, isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? 0.8f : 1.0f);
+            drawEntries(c, dataSet, isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? 0.8f : 1.0f, alpha);
         }
     }
 
@@ -626,7 +632,7 @@ public class LineChartRenderer extends LineRadarRenderer {
      */
     private float[] mCirclesBuffer = new float[2];
 
-    protected void drawEntries(Canvas c, ILineDataSet dataSet, float scale) {
+    protected void drawEntries(Canvas c, ILineDataSet dataSet, float scale, int alpha) {
 
         if (!dataSet.isDrawCirclesEnabled()) return;
 
@@ -659,11 +665,11 @@ public class LineChartRenderer extends LineRadarRenderer {
             mImageCaches.put(dataSet, imageCache);
         }
 
-        boolean changeRequired = imageCache.init(dataSet, scale);
+        boolean changeRequired = imageCache.init(dataSet, scale, alpha);
 
         // only fill the cache with new bitmaps if a change is required
         if (changeRequired) {
-            imageCache.fill(dataSet, drawCircleHole, drawTransparentCircleHole, drawCirclesAsRectangles, scale);
+            imageCache.fill(dataSet, drawCircleHole, drawTransparentCircleHole, drawCirclesAsRectangles, scale, alpha);
         }
 
         int boundsRangeCount = mXBounds.range + mXBounds.min;
@@ -703,6 +709,7 @@ public class LineChartRenderer extends LineRadarRenderer {
         boolean isGroupSelectionEnabled = mChart.isGroupSelectionEnabled();
 
         float scale = isEnlargeEntryOnHighlightEnabled ? 1.2f : 1.0f;
+        int alpha = 255;
 
         if(isGroupSelectionEnabled) {
             for (Highlight high : indices) {
@@ -719,12 +726,12 @@ public class LineChartRenderer extends LineRadarRenderer {
                 for(ILineDataSet set : dataSetsWithDataBetween) {
                     if (set == null || !set.isHighlightEnabled())
                         continue;
-                    drawChartLines(c, set, scale);
+                    drawChartLines(c, set, scale, alpha);
                 }
                 for(ILineDataSet set : dataSetsWithDataBetween) {
                     if (set == null || !set.isHighlightEnabled())
                         continue;
-                    drawEntries(c, set, scale);
+                    drawEntries(c, set, scale, alpha);
                 }
             }
         } else {
@@ -821,6 +828,7 @@ public class LineChartRenderer extends LineRadarRenderer {
         private Bitmap[] circleBitmaps;
 
         private float savedScale = 1.0f;
+        private int savedAlpha = 255;
 
         /**
          * Sets up the cache, returns true if a change of cache was required.
@@ -828,7 +836,7 @@ public class LineChartRenderer extends LineRadarRenderer {
          * @param set
          * @return
          */
-        protected boolean init(ILineDataSet set, float scale) {
+        protected boolean init(ILineDataSet set, float scale, int alpha) {
 
             int size = 0;
             int sizeColors = set.getCircleColorCount();
@@ -840,9 +848,10 @@ public class LineChartRenderer extends LineRadarRenderer {
             }
             boolean changeRequired = false;
 
-            if (circleBitmaps == null || circleBitmaps.length != size || scale != savedScale) {
+            if (circleBitmaps == null || circleBitmaps.length != size || scale != savedScale || alpha != savedAlpha) {
                 circleBitmaps = new Bitmap[size];
                 savedScale = scale;
+                savedAlpha = alpha;
                 changeRequired = true;
             }
 
@@ -856,7 +865,11 @@ public class LineChartRenderer extends LineRadarRenderer {
          * @param drawCircleHole
          * @param drawTransparentCircleHole
          */
-        protected void fill(ILineDataSet set, boolean drawCircleHole, boolean drawTransparentCircleHole, boolean drawCirclesAsRectangles, float scale) {
+        protected void fill(ILineDataSet set, 
+            boolean drawCircleHole, 
+            boolean drawTransparentCircleHole, 
+            boolean drawCirclesAsRectangles, 
+            float scale, int alpha) {
 
             int count = 0;
             int countColors = set.getCircleColorCount();
@@ -878,6 +891,8 @@ public class LineChartRenderer extends LineRadarRenderer {
                 circleBitmaps[i] = circleBitmap;
                 mRenderPaint.setColor(set.getCircleColor(i));
                 mCirclePaintInner.setColor(set.getCircleHoleColor(i));
+                mRenderPaint.setAlpha(alpha);
+                mCirclePaintInner.setAlpha(alpha);
 
                 if (drawTransparentCircleHole) {
                     // Begin path for circle with hole
