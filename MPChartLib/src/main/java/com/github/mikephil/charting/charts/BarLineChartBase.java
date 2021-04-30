@@ -58,6 +58,13 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
     protected boolean mAutoScaleMinMaxEnabled = false;
 
     /**
+     * 
+     */
+    protected boolean mEnlargeEntryOnHighlightEnabled = false;
+
+    protected boolean mMakeUnhighlightedEntriesSmalledEnabled = false;
+
+    /**
      * flag that indicates if pinch-zoom is enabled. if true, both x and y axis
      * can be scaled with 2 fingers, if false, x and y axis can be scaled
      * separately
@@ -1587,6 +1594,22 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
      */
     public void setAutoScaleMinMaxEnabled(boolean enabled) {
         mAutoScaleMinMaxEnabled = enabled;
+    }
+
+    public void setEnlargeEntryOnHighlightEnabled(boolean enabled) {
+        mEnlargeEntryOnHighlightEnabled = enabled;
+    }
+
+    public boolean isEnlargeEntryOnHighlightEnabled() {
+        return mEnlargeEntryOnHighlightEnabled;
+    }
+
+    public void setMakeUnhighlightedEntriesSmalledEnabled(boolean enabled) {
+        mMakeUnhighlightedEntriesSmalledEnabled = enabled;
+    }
+
+    public boolean isMakeUnhighlightedEntriesSmalledEnabled() {
+        return mMakeUnhighlightedEntriesSmalledEnabled;
     }
 
     /**

@@ -97,13 +97,14 @@ public class LineChartRenderer extends LineRadarRenderer {
         LineData lineData = mChart.getLineData();
 
         boolean hasValuesToHighlight = ((LineChart) mChart).valuesToHighlight();
-        boolean groupSelectionEnabled = mChart.isGroupSelectionEnabled();
+        boolean isMakeUnhighlightedEntriesSmalledEnabled = mChart.isMakeUnhighlightedEntriesSmalledEnabled();
+
+        float scale = isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? 0.8f : 1.0f;
 
         for (ILineDataSet set : lineData.getDataSets()) {
 
             if (set.isVisible())
-                // TODO: add proper logic for size decrease later
-                drawChartLines(c, set, groupSelectionEnabled && hasValuesToHighlight ? 0.8f : 1.0f);
+                drawChartLines(c, set, scale);
         }
 
         c.drawBitmap(drawBitmap, 0, 0, mRenderPaint);
@@ -605,13 +606,13 @@ public class LineChartRenderer extends LineRadarRenderer {
     public void drawExtras(Canvas c) {
 
         boolean hasValuesToHighlight = ((LineChart) mChart).valuesToHighlight();
-        boolean groupSelectionEnabled = mChart.isGroupSelectionEnabled();
+        boolean isMakeUnhighlightedEntriesSmalledEnabled = mChart.isMakeUnhighlightedEntriesSmalledEnabled();
 
         List<ILineDataSet> dataSets = mChart.getLineData().getDataSets();
 
         for(ILineDataSet dataSet : dataSets) {
             // TODO: add proper scaling logic here
-            drawEntries(c, dataSet, groupSelectionEnabled && hasValuesToHighlight ? 0.8f : 1.0f);
+            drawEntries(c, dataSet, isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? 0.8f : 1.0f);
         }
     }
 
@@ -698,7 +699,12 @@ public class LineChartRenderer extends LineRadarRenderer {
 
         LineData lineData = mChart.getLineData();
 
-        if(mChart.isGroupSelectionEnabled()) {
+        boolean isEnlargeEntryOnHighlightEnabled = mChart.isEnlargeEntryOnHighlightEnabled();
+        boolean isGroupSelectionEnabled = mChart.isGroupSelectionEnabled();
+
+        float scale = isEnlargeEntryOnHighlightEnabled ? 1.2f : 1.0f;
+
+        if(isGroupSelectionEnabled) {
             for (Highlight high : indices) {
 
                 List<ILineDataSet> dataSets = mChart.getLineData().getDataSets();
@@ -713,12 +719,12 @@ public class LineChartRenderer extends LineRadarRenderer {
                 for(ILineDataSet set : dataSetsWithDataBetween) {
                     if (set == null || !set.isHighlightEnabled())
                         continue;
-                    drawChartLines(c, set, 1.2f);
+                    drawChartLines(c, set, scale);
                 }
                 for(ILineDataSet set : dataSetsWithDataBetween) {
                     if (set == null || !set.isHighlightEnabled())
                         continue;
-                    drawEntries(c, set, 1.2f);
+                    drawEntries(c, set, scale);
                 }
             }
         } else {
@@ -734,16 +740,40 @@ public class LineChartRenderer extends LineRadarRenderer {
                 if (!isInBoundsX(e, set))
                     continue;
 
+                int indexInDataSet = set.getEntryIndex(e);
+                
+                float circleRadius = set.getCircleRadius() * scale;
+                float circleHoleRadius = set.getCircleHoleRadius() * scale;
+
+                mRenderPaint.setColor(set.getCircleColor(indexInDataSet));
+                mCirclePaintInner.setColor(set.getCircleHoleColor(indexInDataSet));
+
+                boolean drawCircleHole = set.isDrawCircleHoleEnabled() &&
+                circleHoleRadius < circleRadius &&
+                circleHoleRadius > 0.f;
+
                 MPPointD pix = mChart.getTransformer(set.getAxisDependency()).getPixelForValues(e.getX(), e.getY() * mAnimator
                         .getPhaseY());
 
-                high.setDraw((float) pix.x, (float) pix.y);
-
-                // draw the lines
-                drawHighlightLines(c, (float) pix.x, (float) pix.y, set);
+                c.drawCircle(
+                    (float) pix.x,
+                    (float) pix.y,
+                    circleRadius,
+                    mRenderPaint);
+                if (drawCircleHole) {
+                    c.drawCircle(
+                        (float) pix.x,
+                        (float) pix.y,
+                        circleHoleRadius,
+                        mCirclePaintInner);
+                }
             }
         }
     }
+
+    // high.setDraw((float) pix.x, (float) pix.y);
+    // // draw the lines
+    // drawHighlightLines(c, (float) pix.x, (float) pix.y, set);
 
     /**
      * Sets the Bitmap.Config to be used by this renderer.

@@ -10,6 +10,7 @@ import android.graphics.Path;
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.buffer.BarBuffer;
 import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
@@ -85,8 +86,13 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
             IBarDataSet set = barData.getDataSetByIndex(i);
 
+            boolean hasValuesToHighlight = ((BarChart) mChart).valuesToHighlight();
+            boolean isMakeUnhighlightedEntriesSmalledEnabled = mChart.isMakeUnhighlightedEntriesSmalledEnabled();
+
+            float scale = isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? 0.8f : 1.0f;
+
             if (set.isVisible()) {
-                drawDataSet(c, set, i);
+                drawDataSet(c, set, i, scale);
             }
         }
     }
@@ -94,7 +100,7 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
     // comment
     private RectF mBarShadowRectBuffer = new RectF();
 
-    protected void drawDataSet(Canvas c, IBarDataSet dataSet, int index) {
+    protected void drawDataSet(Canvas c, IBarDataSet dataSet, int index, float scale) {
 
         Transformer trans = mChart.getTransformer(dataSet.getAxisDependency());
 
@@ -106,14 +112,13 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
         float phaseX = mAnimator.getPhaseX();
         float phaseY = mAnimator.getPhaseY();
 
+        float barWidth = mChart.getBarData().getBarWidth() * scale;
+        float barWidthHalf = barWidth / 2.0f;
+
         // draw the bar shadow before the values
         if (mChart.isDrawBarShadowEnabled()) {
             mShadowPaint.setColor(dataSet.getBarShadowColor());
 
-            BarData barData = mChart.getBarData();
-
-            final float barWidth = barData.getBarWidth();
-            final float barWidthHalf = barWidth / 2.0f;
             float x;
 
             for (int i = 0, count = Math.min((int)(Math.ceil((float)(dataSet.getEntryCount()) * phaseX)), dataSet.getEntryCount());
@@ -147,7 +152,7 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
         buffer.setPhases(phaseX, phaseY);
         buffer.setDataSet(index);
         buffer.setInverted(mChart.isInverted(dataSet.getAxisDependency()));
-        buffer.setBarWidth(mChart.getBarData().getBarWidth());
+        buffer.setBarWidth(barWidth);
 
         buffer.feed(dataSet);
 
@@ -452,7 +457,12 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
     @Override
     public void drawHighlighted(Canvas c, Highlight[] indices) {
 
+        boolean isEnlargeEntryOnHighlightEnabled = mChart.isEnlargeEntryOnHighlightEnabled();
+        float scale = isEnlargeEntryOnHighlightEnabled ? 1.2f : 1.0f;
+
         BarData barData = mChart.getBarData();
+        float barWidth = barData.getBarWidth() * scale;
+        float barWidthHalf = barWidth / 2.0f;
 
         for (Highlight high : indices) {
 
@@ -493,14 +503,13 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                 y2 = 0.f;
             }
 
-            prepareBarHighlight(e.getX(), y1, y2, barData.getBarWidth() / 2f, trans);
+            prepareBarHighlight(e.getX(), y1, y2, barWidthHalf, trans);
 
             if(set.getHighlightLineWidth() > 0.0) {
                 MPPointD pix = trans.getPixelForValues(e.getX(), e.getY() * mAnimator
                     .getPhaseY());
                 high.setDraw((float) pix.x, (float) pix.y);
-                // draw the lines
-                drawHighlightLines(c, (float) pix.x, (float) pix.y, set, mBarRect);
+                drawHighlightLine(c, (float) pix.x, (float) pix.y, set, mBarRect);
             }
 
             mHighlightPaint.setColor(set.getHighLightColor());
@@ -531,7 +540,7 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
      * @param y y-position of the highlight line intersection
      * @param set the currently drawn dataset
      */
-    protected void drawHighlightLines(Canvas c, float x, float y, IBarDataSet set, RectF bar) {
+    protected void drawHighlightLine(Canvas c, float x, float y, IBarDataSet set, RectF bar) {
 
         // set color and stroke-width
         mHighlightPaint.setColor(set.getHighlightLineColor());
