@@ -82,16 +82,19 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
         BarData barData = mChart.getBarData();
 
+        boolean hasValuesToHighlight = ((BarChart) mChart).valuesToHighlight();
+        boolean isMakeUnhighlightedEntriesSmalledEnabled = mChart.isMakeUnhighlightedEntriesSmalledEnabled();
+        boolean isDimmingEnabled = mChart.isDimmingEnabled();
+
+        float decreaseScale = mChart.getDecreaseScaleForUnhighlightedEntry();
+        int dimmingAlpha = mChart.getDimmingAlpha();
+
+        float scale = isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? decreaseScale : 1.0f;
+        int alpha = isDimmingEnabled && hasValuesToHighlight ? dimmingAlpha : 255;
+
         for (int i = 0; i < barData.getDataSetCount(); i++) {
 
             IBarDataSet set = barData.getDataSetByIndex(i);
-
-            boolean hasValuesToHighlight = ((BarChart) mChart).valuesToHighlight();
-            boolean isMakeUnhighlightedEntriesSmalledEnabled = mChart.isMakeUnhighlightedEntriesSmalledEnabled();
-
-            float scale = isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? 0.8f : 1.0f;
-
-            int alpha = hasValuesToHighlight ? 120 : 255;
 
             if (set.isVisible()) {
                 drawDataSet(c, set, i, scale, alpha);
@@ -470,7 +473,9 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
     public void drawHighlighted(Canvas c, Highlight[] indices) {
 
         boolean isEnlargeEntryOnHighlightEnabled = mChart.isEnlargeEntryOnHighlightEnabled();
-        float scale = isEnlargeEntryOnHighlightEnabled ? 1.2f : 1.0f;
+        float enlargementScale = mChart.getEnlargementScaleForHighlightedEntry();
+
+        float scale = isEnlargeEntryOnHighlightEnabled ? enlargementScale : 1.0f;
         int alpha = 255;
 
         BarData barData = mChart.getBarData();

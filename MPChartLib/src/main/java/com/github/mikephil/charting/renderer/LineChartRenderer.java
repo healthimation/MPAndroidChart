@@ -98,9 +98,13 @@ public class LineChartRenderer extends LineRadarRenderer {
 
         boolean hasValuesToHighlight = ((LineChart) mChart).valuesToHighlight();
         boolean isMakeUnhighlightedEntriesSmalledEnabled = mChart.isMakeUnhighlightedEntriesSmalledEnabled();
+        boolean isDimmingEnabled = mChart.isDimmingEnabled();
 
-        float scale = isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? 0.8f : 1.0f;
-        int alpha = hasValuesToHighlight ? 120 : 255;
+        float decreaseScale = mChart.getDecreaseScaleForUnhighlightedEntry();
+        int dimmingAlpha = mChart.getDimmingAlpha();
+
+        float scale = isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? decreaseScale : 1.0f;
+        int alpha = isDimmingEnabled && hasValuesToHighlight ? dimmingAlpha : 255;
 
         for (ILineDataSet set : lineData.getDataSets()) {
 
@@ -615,14 +619,18 @@ public class LineChartRenderer extends LineRadarRenderer {
 
         boolean hasValuesToHighlight = ((LineChart) mChart).valuesToHighlight();
         boolean isMakeUnhighlightedEntriesSmalledEnabled = mChart.isMakeUnhighlightedEntriesSmalledEnabled();
+        boolean isDimmingEnabled = mChart.isDimmingEnabled();
+
+        float decreaseScale = mChart.getDecreaseScaleForUnhighlightedEntry();
+        int dimmingAlpha = mChart.getDimmingAlpha();
 
         List<ILineDataSet> dataSets = mChart.getLineData().getDataSets();
 
-        int alpha = hasValuesToHighlight ? 50 : 255;
+        float scale = isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? decreaseScale : 1.0f;
+        int alpha = isDimmingEnabled && hasValuesToHighlight ? dimmingAlpha : 255;
 
         for(ILineDataSet dataSet : dataSets) {
-            // TODO: add proper scaling logic here
-            drawEntries(c, dataSet, isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? 0.8f : 1.0f, alpha);
+            drawEntries(c, dataSet, scale, alpha);
         }
     }
 
@@ -712,7 +720,9 @@ public class LineChartRenderer extends LineRadarRenderer {
         boolean isEnlargeEntryOnHighlightEnabled = mChart.isEnlargeEntryOnHighlightEnabled();
         boolean isGroupSelectionEnabled = mChart.isGroupSelectionEnabled();
 
-        float scale = isEnlargeEntryOnHighlightEnabled ? 1.2f : 1.0f;
+        float enlargementScale = mChart.getEnlargementScaleForHighlightedEntry();
+
+        float scale = isEnlargeEntryOnHighlightEnabled ? enlargementScale : 1.0f;
         int alpha = 255;
 
         if(isGroupSelectionEnabled) {

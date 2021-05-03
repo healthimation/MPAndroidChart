@@ -64,6 +64,14 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
     protected boolean mMakeUnhighlightedEntriesSmalledEnabled = false;
 
+    protected boolean mDimmingEnabled = false;
+
+    protected float mEnlargementScaleForHighlightedEntry = 1.2f;
+
+    protected float mDecreaseScaleForUnhighlightedEntry = 0.8f;
+
+    protected int mDimmingAlpha = 120;
+
     /**
      * flag that indicates if pinch-zoom is enabled. if true, both x and y axis
      * can be scaled with 2 fingers, if false, x and y axis can be scaled
@@ -1598,6 +1606,38 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
     public boolean isEnlargeEntryOnHighlightEnabled() {
         return mEnlargeEntryOnHighlightEnabled;
+    }
+
+    public void setEnlargementScaleForHighlightedEntry(float scale) {
+        mEnlargementScaleForHighlightedEntry = scale;
+    }
+
+    public float getEnlargementScaleForHighlightedEntry() {
+        return mEnlargementScaleForHighlightedEntry;
+    }
+
+    public void setDecreaseScaleForUnhighlightedEntry(float scale) {
+        mDecreaseScaleForUnhighlightedEntry = scale;
+    }
+
+    public float getDecreaseScaleForUnhighlightedEntry() {
+        return mDecreaseScaleForUnhighlightedEntry;
+    }
+
+    public void setDimmingAlpha(int alpha) {
+        mDimmingAlpha = alpha;
+    }
+
+    public int getDimmingAlpha() {
+        return mDimmingAlpha;
+    }
+
+    public void setDimmingEnabled(boolean enabled) {
+        mDimmingEnabled = enabled;
+    }
+
+    public boolean isDimmingEnabled() {
+        return mDimmingEnabled;
     }
 
     public void setMakeUnhighlightedEntriesSmalledEnabled(boolean enabled) {
