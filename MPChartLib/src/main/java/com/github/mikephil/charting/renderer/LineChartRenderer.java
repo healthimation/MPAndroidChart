@@ -100,7 +100,7 @@ public class LineChartRenderer extends LineRadarRenderer {
         boolean isMakeUnhighlightedEntriesSmalledEnabled = mChart.isMakeUnhighlightedEntriesSmalledEnabled();
 
         float scale = isMakeUnhighlightedEntriesSmalledEnabled && hasValuesToHighlight ? 0.8f : 1.0f;
-        int alpha = hasValuesToHighlight ? 50 : 255;
+        int alpha = hasValuesToHighlight ? 120 : 255;
 
         for (ILineDataSet set : lineData.getDataSets()) {
 

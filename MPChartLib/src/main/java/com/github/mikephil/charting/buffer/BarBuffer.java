@@ -4,6 +4,8 @@ package com.github.mikephil.charting.buffer;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 
+import java.util.Arrays;
+
 public class BarBuffer extends AbstractBuffer<IBarDataSet> {
 
     protected int mDataSetIndex = 0;
@@ -38,6 +40,14 @@ public class BarBuffer extends AbstractBuffer<IBarDataSet> {
         buffer[index++] = top;
         buffer[index++] = right;
         buffer[index++] = bottom;
+    }
+
+    public float[] getBufferByEntryIndex(int index, int stackSize) {
+
+        int startIndex = index * 4 * stackSize;
+        int endIndex = startIndex + 4 * stackSize;
+
+        return Arrays.copyOfRange(buffer, startIndex, endIndex);
     }
 
     @Override
