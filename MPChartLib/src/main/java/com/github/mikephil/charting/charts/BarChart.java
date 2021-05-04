@@ -20,7 +20,6 @@ import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.accessibility.ExploreByTouchHelper;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.highlight.BarHighlighter;
@@ -417,12 +416,15 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
                 BarEntry entry = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
                 switch (action) {
                     case AccessibilityNodeInfoCompat.ACTION_CLICK:
-                        Highlight high = new Highlight(entry.getX(), entry.getY(), 0);
+                        Highlight high = new Highlight(entry.getX(), entry.getY(), dataSetIndex);
                         highlightValue(high);
                         mSelectionListener.onValueSelected(entry, high);
                         AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId);
                         CharSequence accessibilityLabel = getDescriptionForIndex(virtualViewId, node);
-                        getRootView().announceForAccessibility(R.string.selected + ", " + accessibilityLabel);
+                        getRootView().announceForAccessibility(getContext().getText(R.string.selected) + ", " + accessibilityLabel);
+                        return true;
+                    case AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS:
+                        accessibilityPerformActions.clearAccessibilityFocus(virtualViewId, mData.getEntryCount());
                         return true;
                 }
             }

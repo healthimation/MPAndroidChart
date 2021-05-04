@@ -8,11 +8,9 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.view.ViewCompat;
@@ -20,18 +18,14 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.accessibility.ExploreByTouchHelper;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.renderer.LineChartRenderer;
+import com.github.mikephil.charting.utils.MPPointD;
 import com.github.mikephil.charting.utils.Utils;
 
 import java.util.List;
@@ -64,15 +58,10 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
     @Override
     protected void init() {
         super.init();
-
         mRenderer = new LineChartRenderer(this, mAnimator, mViewPortHandler);
-
-        if (mData != null) {
-            mLineGraphAccessHelper = new LineGraphAccessHelper(this);
-            ViewCompat.setAccessibilityDelegate(this, mLineGraphAccessHelper);
-        }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void setData(LineData data) {
         super.setData(data);
@@ -121,12 +110,13 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
         ILineDataSet set = mData.getDataSetByIndex(dataSetIndex);
         Entry e = set.getEntryForIndex(getEntryIndex(dataSetIndex, index, mData));
         float x = e.getX();
-
-        float barWidthHalf = 0.4f / 2f;
+        float barWidthHalf = 1f / 2f;
+        MPPointD pix = getTransformer(set.getAxisDependency()).getPixelForValues(e.getX(), e.getY() * mAnimator
+                .getPhaseY());
         float left = x - barWidthHalf;
         float right = x + barWidthHalf;
-        float top = mViewPortHandler.contentTop();
-        float bottom = mViewPortHandler.contentBottom();
+        float top = (float) pix.y - 30f;
+        float bottom = (float) pix.y + 30f;
 
         bounds.set(left, top, right, bottom);
 
@@ -219,12 +209,15 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
                 Entry entry = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
                 switch (action) {
                     case AccessibilityNodeInfoCompat.ACTION_CLICK:
-                        Highlight high = new Highlight(entry.getX(), entry.getY(), 0);
+                        Highlight high = new Highlight(entry.getX(), entry.getY(), dataSetIndex);
                         highlightValue(high);
                         mSelectionListener.onValueSelected(entry, high);
                         AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId);
                         CharSequence accessibilityLabel = getDescriptionForIndex(virtualViewId, node);
-                        getRootView().announceForAccessibility(R.string.selected + ", " + accessibilityLabel);
+                        getRootView().announceForAccessibility(getContext().getText(R.string.selected)+ ", " + accessibilityLabel);
+                        return true;
+                    case AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS:
+                        accessibilityPerformActions.clearAccessibilityFocus(virtualViewId, mData.getEntryCount());
                         return true;
                 }
             }
