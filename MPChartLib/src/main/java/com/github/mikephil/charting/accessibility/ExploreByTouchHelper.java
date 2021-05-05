@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
+import android.widget.Button;
 
 import androidx.core.view.AccessibilityDelegateCompat;
 import androidx.core.view.ViewCompat;
@@ -285,6 +286,7 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
         // actions from a node, copy over the necessary fields.
         final AccessibilityNodeInfoCompat result = AccessibilityNodeInfoCompat.obtain(mHost);
         final AccessibilityNodeInfoCompat source = AccessibilityNodeInfoCompat.obtain(mHost);
+        source.setClassName(Button.class.getName());
         ViewCompat.onInitializeAccessibilityNodeInfo(mHost, source);
 
         // Copy over parent and screen bounds.
@@ -318,6 +320,7 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
         // The root node is identical to the parent node, except that it is a
         // child of the parent view and is populated with virtual descendants.
         final AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(mHost);
+        node.setClassName(Button.class.getName());
         ViewCompat.onInitializeAccessibilityNodeInfo(mHost, node);
 
         // Add the virtual descendants.

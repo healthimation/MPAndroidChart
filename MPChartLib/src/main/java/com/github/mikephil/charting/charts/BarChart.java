@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
@@ -19,20 +20,19 @@ import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.accessibility.ExploreByTouchHelper;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.highlight.BarHighlighter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.renderer.BarChartRenderer;
-import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
 
-import java.util.Arrays;
 import java.util.List;
+
+import static com.github.mikephil.charting.utils.Utils.getDataSetIndex;
+import static com.github.mikephil.charting.utils.Utils.getEntryIndex;
 
 /**
  * Chart that draws bars.
@@ -200,30 +200,6 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
         getTransformer(set.getAxisDependency()).rectValueToPixel(outputRect);
     }
 
-    public int getDataSetIndex(int index) {
-        int size = index;
-        for (int i = 0; i < mData.getDataSets().size(); i++) {
-            if (size == 0) return i;
-            int dataSetSize = ((BarDataSet)mData.getDataSets().get(i)).getValues().size();
-            if (dataSetSize <= size) {
-                size -= dataSetSize;
-            } else {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    public int getEntryIndex(int dataSetIndex, int index) {
-        int size = -1;
-        if (dataSetIndex == 0) return index;
-        for (int i = 0; i <= dataSetIndex; i++) {
-            size += ((BarDataSet)mData.getDataSets().get(i)).getValues().size() - i;
-        }
-
-        return size - index;
-    }
-
     public Rect getBarBoundsByIndex(int index, Rect outputRect) {
         RectF bounds = new RectF(outputRect);
 
@@ -232,9 +208,9 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
             return new Rect(Math.round(bounds.left),Math.round(bounds.top), Math.round(bounds.right), Math.round(bounds.bottom));
         }
 
-        int dataSetIndex = getDataSetIndex(index);
+        int dataSetIndex = getDataSetIndex(index, mData);
         IBarDataSet set = mData.getDataSetByIndex(dataSetIndex);
-        BarEntry e = set.getEntryForIndex(getEntryIndex(dataSetIndex, index));
+        BarEntry e = set.getEntryForIndex(getEntryIndex(dataSetIndex, index, mData));
         float x = e.getX();
 
         float barWidthHalf = mData.getBarWidth() / 2f;
@@ -398,11 +374,12 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
 
         }
 
-        private CharSequence getDescriptionForIndex(int index) {
+        private CharSequence getDescriptionForIndex(int index, AccessibilityNodeInfoCompat node) {
             if (mData != null) {
-                int dataSetIndex = getDataSetIndex(index);
-                int entryIndex = getEntryIndex(dataSetIndex, index);
+                int dataSetIndex = getDataSetIndex(index, mData);
+                int entryIndex = getEntryIndex(dataSetIndex, index, mData);
                 BarEntry e = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
+                node.setSelected(valuesToHighlight() && getHighlighted()[0].getX() == e.getX());
                 return e.getAccessibilityLabel();
             }
             return "accessibility label";
@@ -410,7 +387,7 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
 
         @Override
         protected void populateEventForVirtualViewId(int virtualViewId, AccessibilityEvent event) {
-            final CharSequence desc = getDescriptionForIndex(virtualViewId);
+            final CharSequence desc = getDescriptionForIndex(virtualViewId, AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId));
             event.setContentDescription(desc);
         }
 
@@ -418,7 +395,7 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
         protected void populateNodeForVirtualViewId(
                 int virtualViewId, AccessibilityNodeInfoCompat node) {
             // Node and event descriptions are usually identical.
-            final CharSequence desc = getDescriptionForIndex(virtualViewId);
+            final CharSequence desc = getDescriptionForIndex(virtualViewId, node);
             node.setContentDescription(desc);
 
             // Since the user can tap a bar, add the CLICK action.
@@ -429,18 +406,25 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
             node.setBoundsInParent(bounds);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
         @Override
         protected boolean performActionForVirtualViewId(
                 int virtualViewId, int action, Bundle arguments) {
             if (mData != null && virtualViewId > 0) {
-                int dataSetIndex = getDataSetIndex(virtualViewId);
-                int entryIndex = getEntryIndex(dataSetIndex, virtualViewId);
+                int dataSetIndex = getDataSetIndex(virtualViewId, mData);
+                int entryIndex = getEntryIndex(dataSetIndex, virtualViewId, mData);
                 BarEntry entry = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
                 switch (action) {
                     case AccessibilityNodeInfoCompat.ACTION_CLICK:
-                        Highlight high = new Highlight(entry.getX(), entry.getY(), 0);
+                        Highlight high = new Highlight(entry.getX(), entry.getY(), dataSetIndex);
                         highlightValue(high);
                         mSelectionListener.onValueSelected(entry, high);
+                        AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId);
+                        CharSequence accessibilityLabel = getDescriptionForIndex(virtualViewId, node);
+                        getRootView().announceForAccessibility(getContext().getText(R.string.selected) + ", " + accessibilityLabel);
+                        return true;
+                    case AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS:
+                        accessibilityPerformActions.clearAccessibilityFocus(virtualViewId, mData.getEntryCount());
                         return true;
                 }
             }
