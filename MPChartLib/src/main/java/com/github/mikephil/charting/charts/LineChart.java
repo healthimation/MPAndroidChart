@@ -40,6 +40,18 @@ import static com.github.mikephil.charting.utils.Utils.getEntryIndex;
  */
 public class LineChart extends BarLineChartBase<LineData> implements LineDataProvider {
 
+    /**
+     * flag that indicates if group selection is on
+     */
+    protected boolean mGroupSelectionEnabled = false;
+
+    public void setGroupSelectionEnabled(boolean enabled) {
+        mGroupSelectionEnabled = enabled;
+    }
+
+    public boolean isGroupSelectionEnabled() {
+        return mGroupSelectionEnabled;
+    }
     /** Explore by touch helper, used to expose contents for accessibility. */
     private LineGraphAccessHelper mLineGraphAccessHelper;
 

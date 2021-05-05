@@ -51,8 +51,9 @@ public class HorizontalBarChartRenderer extends BarChartRenderer {
 
     private RectF mBarShadowRectBuffer = new RectF();
 
+    // TODO: add support for dimming and scaling width
     @Override
-    protected void drawDataSet(Canvas c, IBarDataSet dataSet, int index) {
+    protected void drawDataSet(Canvas c, IBarDataSet dataSet, int index, float scale, int alpha) {
 
         Transformer trans = mChart.getTransformer(dataSet.getAxisDependency());
 

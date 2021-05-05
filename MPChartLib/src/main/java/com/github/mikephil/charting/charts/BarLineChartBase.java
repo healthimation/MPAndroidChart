@@ -58,6 +58,21 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
     protected boolean mAutoScaleMinMaxEnabled = false;
 
     /**
+     * 
+     */
+    protected boolean mEnlargeEntryOnHighlightEnabled = false;
+
+    protected boolean mMakeUnhighlightedEntriesSmalledEnabled = false;
+
+    protected boolean mDimmingEnabled = false;
+
+    protected float mEnlargementScaleForHighlightedEntry = 1.2f;
+
+    protected float mDecreaseScaleForUnhighlightedEntry = 0.8f;
+
+    protected int mDimmingAlpha = 120;
+
+    /**
      * flag that indicates if pinch-zoom is enabled. if true, both x and y axis
      * can be scaled with 2 fingers, if false, x and y axis can be scaled
      * separately
@@ -245,14 +260,15 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         if (!mAxisRight.isDrawGridLinesBehindDataEnabled())
             mAxisRendererRight.renderGridLines(canvas);
 
+        mRenderer.drawExtras(canvas);
+
         // if highlighting is enabled
         if (valuesToHighlight())
             mRenderer.drawHighlighted(canvas, mIndicesToHighlight);
 
         // Removes clipping rectangle
+        // TODO: previously was before mRenderer.drawExtras(canvas) (could affect how line chart dots are drawn)
         canvas.restoreToCount(clipRestoreCount);
-
-        mRenderer.drawExtras(canvas);
 
         if (mXAxis.isEnabled() && !mXAxis.isDrawLimitLinesBehindDataEnabled())
             mXAxisRenderer.renderLimitLines(canvas);
@@ -1582,6 +1598,54 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
      */
     public void setAutoScaleMinMaxEnabled(boolean enabled) {
         mAutoScaleMinMaxEnabled = enabled;
+    }
+
+    public void setEnlargeEntryOnHighlightEnabled(boolean enabled) {
+        mEnlargeEntryOnHighlightEnabled = enabled;
+    }
+
+    public boolean isEnlargeEntryOnHighlightEnabled() {
+        return mEnlargeEntryOnHighlightEnabled;
+    }
+
+    public void setEnlargementScaleForHighlightedEntry(float scale) {
+        mEnlargementScaleForHighlightedEntry = scale;
+    }
+
+    public float getEnlargementScaleForHighlightedEntry() {
+        return mEnlargementScaleForHighlightedEntry;
+    }
+
+    public void setDecreaseScaleForUnhighlightedEntry(float scale) {
+        mDecreaseScaleForUnhighlightedEntry = scale;
+    }
+
+    public float getDecreaseScaleForUnhighlightedEntry() {
+        return mDecreaseScaleForUnhighlightedEntry;
+    }
+
+    public void setDimmingAlpha(int alpha) {
+        mDimmingAlpha = alpha;
+    }
+
+    public int getDimmingAlpha() {
+        return mDimmingAlpha;
+    }
+
+    public void setDimmingEnabled(boolean enabled) {
+        mDimmingEnabled = enabled;
+    }
+
+    public boolean isDimmingEnabled() {
+        return mDimmingEnabled;
+    }
+
+    public void setMakeUnhighlightedEntriesSmalledEnabled(boolean enabled) {
+        mMakeUnhighlightedEntriesSmalledEnabled = enabled;
+    }
+
+    public boolean isMakeUnhighlightedEntriesSmalledEnabled() {
+        return mMakeUnhighlightedEntriesSmalledEnabled;
     }
 
     /**
