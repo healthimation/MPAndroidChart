@@ -19,13 +19,10 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 
-import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet;
 import com.github.mikephil.charting.data.ChartData;
 import com.github.mikephil.charting.formatter.DefaultValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 
 import java.util.List;
 

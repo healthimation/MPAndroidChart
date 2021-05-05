@@ -13,7 +13,6 @@ import android.graphics.Paint.Align;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore.Images;
 import androidx.annotation.RequiresApi;
@@ -24,8 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import com.github.mikephil.charting.accessibility.AccessibilityPerformActions;
 import com.github.mikephil.charting.animation.ChartAnimator;
-import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.animation.Easing.EasingFunction;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.IMarker;
@@ -65,6 +64,11 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
         implements ChartInterface {
 
     public static final String LOG_TAG = "MPAndroidChart";
+
+    /**
+     * send accessibility actions
+     */
+    protected AccessibilityPerformActions accessibilityPerformActions;
 
     /**
      * flag that indicates if logging is enabled or not
@@ -301,6 +305,10 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
 
         if (mLogEnabled)
             Log.i(LOG_TAG, "Data is set.");
+    }
+
+    public void setAccessibilityPerformActions(AccessibilityPerformActions accessibilityPerformActions) {
+        this.accessibilityPerformActions = accessibilityPerformActions;
     }
 
     /**
