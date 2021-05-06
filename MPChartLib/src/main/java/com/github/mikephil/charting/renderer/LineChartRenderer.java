@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
+import android.graphics.Shader;
+import android.graphics.LinearGradient;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.charts.LineChart;
@@ -788,10 +790,47 @@ public class LineChartRenderer extends LineRadarRenderer {
                         circleHoleRadius,
                         mCirclePaintInner);
                 }
+
+                drawHighlightArrow(c, (float) pix.x, set, (float) pix.y, circleRadius + 2f);
             }
         }
     }
 
+    protected void drawHighlightArrow(Canvas c, float x, ILineDataSet set, float bottom, float insetBottom) {
+
+        float strokeWidth = 4f;
+        // 45 degree angle
+        float basicHeight = (float) (strokeWidth / Math.sqrt(2));
+
+        mHighlightPaint.setColor(Color.BLACK);
+        mHighlightPaint.setStrokeWidth(strokeWidth);
+
+        float topPointOfArrowHead = mViewPortHandler.contentTop();
+        float bottomPointOfArrow = bottom - insetBottom;
+        float topPointOfArrow = topPointOfArrowHead + basicHeight;
+        // float arrowHeight = bottomPointOfArrow - topPointOfArrow;
+
+        float arrowHeadHeight = 4f * basicHeight;
+        float arrowHeadHalfWidth = 3f * basicHeight;
+
+        // TODO: use two colors!
+        int[] colors = new int[]{Color.BLACK, Color.TRANSPARENT};
+        float[] positions = new float[]{0.6f, 1f};
+        Shader shader = new LinearGradient(0, topPointOfArrow, 0, bottomPointOfArrow, colors, positions, Shader.TileMode.MIRROR);
+
+        // ACTUALLY DRAWING THE ARROW
+        mHighlightPaint.setShader(shader);
+
+        c.drawLine(x, topPointOfArrow, x, bottomPointOfArrow, mHighlightPaint);
+
+        mHighlightPaint.setShader(null);
+
+        c.drawLine(x - arrowHeadHalfWidth, topPointOfArrowHead + arrowHeadHeight, x + basicHeight/2, topPointOfArrowHead + basicHeight/2, mHighlightPaint);
+        c.drawLine(x - basicHeight/2, topPointOfArrowHead + basicHeight/2, x + arrowHeadHalfWidth, topPointOfArrowHead + arrowHeadHeight, mHighlightPaint);
+    
+    }
+
+    // TODO: why do we need to save previous drawing posision inside a highlight?
     // high.setDraw((float) pix.x, (float) pix.y);
     // // draw the lines
     // drawHighlightLines(c, (float) pix.x, (float) pix.y, set);
