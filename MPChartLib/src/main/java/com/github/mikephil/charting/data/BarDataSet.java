@@ -25,19 +25,10 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
 
     private int mBarBorderColor = Color.BLACK;
 
-    private int mHighlightLineColor = Color.BLACK;
-
-    // TODO: to be used later
-    private float mHighlightLineBottomMargin = 2.0f;
-
     /**
      * the alpha value used to draw the highlight indicator bar
      */
     private int mHighLightAlpha = 120;
-    /**
-     * the alpha value used to draw the highlight line indicator bar
-     */
-    private int mHighLightLineAlpha = 120;
 
 
     /**
@@ -79,9 +70,6 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
         barDataSet.mBarBorderWidth = mBarBorderWidth;
         barDataSet.mStackLabels = mStackLabels;
         barDataSet.mHighLightAlpha = mHighLightAlpha;
-        barDataSet.mHighLightLineAlpha = mHighLightLineAlpha;
-        barDataSet.mHighlightLineColor = mHighlightLineColor;
-        barDataSet.mHighlightLineBottomMargin = mHighlightLineBottomMargin;
     }
 
     /**
@@ -220,44 +208,6 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
     }
 
     /**
-     * Sets the color drawing highlight line above the selected bars.
-     *
-     * @return
-     */
-    public void setHighlightLineColor(int color) {
-        mHighlightLineColor = color;
-    }
-
-    /**
-     * Returns the color drawing hightlight line above the bars.
-     *
-     * @return
-     */
-    @Override
-    public int getHighlightLineColor() {
-        return mHighlightLineColor;
-    }
-
-    /**
-     * Sets the bottom inset used for drawing line above the bars.
-     *
-     * @return
-     */
-    public void setHighlightLineBottomMargin(float inset) {
-        mHighlightLineBottomMargin = inset;
-    }
-
-    /**
-     * Returns the bottom inset used for drawing line above the bars.
-     *
-     * @return
-     */
-    @Override
-    public float getHighlightLineBottomMargin() {
-        return mHighlightLineBottomMargin;
-    }
-
-    /**
      * Set the alpha value (transparency) that is used for drawing the highlight
      * indicator bar. min = 0 (fully transparent), max = 255 (fully opaque)
      *
@@ -270,21 +220,6 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
     @Override
     public int getHighLightAlpha() {
         return mHighLightAlpha;
-    }
-
-    /**
-     * Set the alpha value (transparency) that is used for drawing the highlight
-     * line indicator bar. min = 0 (fully transparent), max = 255 (fully opaque)
-     *
-     * @param alpha
-     */
-    public void setHighLightLineAlpha(int alpha) {
-        mHighLightLineAlpha = alpha;
-    }
-
-    @Override
-    public int getHighLightLineAlpha() {
-        return mHighLightLineAlpha;
     }
 
     /**
