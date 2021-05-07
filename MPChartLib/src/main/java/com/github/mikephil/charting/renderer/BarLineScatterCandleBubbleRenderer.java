@@ -1,5 +1,10 @@
 package com.github.mikephil.charting.renderer;
 
+import android.graphics.Color;
+import android.graphics.Canvas;
+import android.graphics.Shader;
+import android.graphics.LinearGradient;
+
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
@@ -92,5 +97,38 @@ public abstract class BarLineScatterCandleBubbleRenderer extends DataRenderer {
             max = entryTo == null ? 0 : dataSet.getEntryIndex(entryTo);
             range = (int) ((max - min) * phaseX);
         }
+    }
+
+    // WARNING: tested only with linecharts / bar charts
+    // Probably need some efforts to be able to work on other charts
+    protected void drawHighlightArrow(Canvas c, float x, float y, float strokeWidth, float insetBottom, int[] colors) {
+
+        // 45 degree angle
+        float basicHeight = (float) (strokeWidth / Math.sqrt(2));
+
+        mHighlightPaint.setColor(Color.BLACK);
+        mHighlightPaint.setStrokeWidth(strokeWidth);
+
+        float topPointOfArrowHead = mViewPortHandler.contentTop();
+        float bottomPointOfArrow = y - insetBottom;
+        float topPointOfArrow = topPointOfArrowHead + basicHeight;
+        // float arrowHeight = bottomPointOfArrow - topPointOfArrow;
+
+        float arrowHeadHeight = 4f * basicHeight;
+        float arrowHeadHalfWidth = 3f * basicHeight;
+
+        float[] positions = new float[]{0.6f, 1f};
+        Shader shader = new LinearGradient(0, topPointOfArrow, 0, bottomPointOfArrow, colors, positions, Shader.TileMode.MIRROR);
+
+        // ACTUALLY DRAWING THE ARROW
+        mHighlightPaint.setShader(shader);
+
+        c.drawLine(x, topPointOfArrow, x, bottomPointOfArrow, mHighlightPaint);
+
+        mHighlightPaint.setShader(null);
+
+        c.drawLine(x - arrowHeadHalfWidth, topPointOfArrowHead + arrowHeadHeight, x + basicHeight/2, topPointOfArrowHead + basicHeight/2, mHighlightPaint);
+        c.drawLine(x - basicHeight/2, topPointOfArrowHead + basicHeight/2, x + arrowHeadHalfWidth, topPointOfArrowHead + arrowHeadHeight, mHighlightPaint);
+    
     }
 }

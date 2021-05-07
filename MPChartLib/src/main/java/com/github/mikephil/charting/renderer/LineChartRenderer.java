@@ -6,8 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
-import android.graphics.Shader;
-import android.graphics.LinearGradient;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.charts.LineChart;
@@ -728,6 +726,8 @@ public class LineChartRenderer extends LineRadarRenderer {
         int alpha = 255;
 
         if(isGroupSelectionEnabled) {
+            // TODO: we use mRenderPaint to draw highlight here. Is that ok?
+            // we only use mHighlightPaint for the arrow
             for (Highlight high : indices) {
 
                 List<ILineDataSet> dataSets = mChart.getLineData().getDataSets();
@@ -749,6 +749,25 @@ public class LineChartRenderer extends LineRadarRenderer {
                         continue;
                     drawEntries(c, set, scale, alpha);
                 }
+
+                // -------------------- ARROW PART --------------------
+                ILineDataSet dataSet = lineData.getDataSetByIndex(high.getDataSetIndex());
+                Entry entry = dataSet.getEntryForXValue(high.getX(), high.getY());
+                float circleRadius = dataSet.getCircleRadius() * scale;
+
+                Entry entryWithHighestY = entry;
+                for(ILineDataSet set : dataSetsWithDataBetween) {
+                    for(Entry e : set.getEntriesForXValue(entryWithHighestY.getX())) {
+                        if(e.getY() > entryWithHighestY.getY()) {
+                            entryWithHighestY = e;
+                        }
+                    }
+                }
+
+                MPPointD pix = mChart.getTransformer(dataSet.getAxisDependency()).getPixelForValues(entryWithHighestY.getX(), entryWithHighestY.getY() * mAnimator
+                        .getPhaseY());
+
+                drawHighlightArrow(c, (float) pix.x, (float) pix.y, 4f, circleRadius + 2f, new int[]{Color.BLACK, Color.TRANSPARENT});
             }
         } else {
             for (Highlight high : indices) {
@@ -791,49 +810,13 @@ public class LineChartRenderer extends LineRadarRenderer {
                         mCirclePaintInner);
                 }
 
-                drawHighlightArrow(c, (float) pix.x, set, (float) pix.y, circleRadius + 2f);
+                drawHighlightArrow(c, (float) pix.x, (float) pix.y, 4f, circleRadius + 2f, new int[]{Color.BLACK, Color.TRANSPARENT});
             }
         }
     }
 
-    protected void drawHighlightArrow(Canvas c, float x, ILineDataSet set, float bottom, float insetBottom) {
-
-        float strokeWidth = 4f;
-        // 45 degree angle
-        float basicHeight = (float) (strokeWidth / Math.sqrt(2));
-
-        mHighlightPaint.setColor(Color.BLACK);
-        mHighlightPaint.setStrokeWidth(strokeWidth);
-
-        float topPointOfArrowHead = mViewPortHandler.contentTop();
-        float bottomPointOfArrow = bottom - insetBottom;
-        float topPointOfArrow = topPointOfArrowHead + basicHeight;
-        // float arrowHeight = bottomPointOfArrow - topPointOfArrow;
-
-        float arrowHeadHeight = 4f * basicHeight;
-        float arrowHeadHalfWidth = 3f * basicHeight;
-
-        // TODO: use two colors!
-        int[] colors = new int[]{Color.BLACK, Color.TRANSPARENT};
-        float[] positions = new float[]{0.6f, 1f};
-        Shader shader = new LinearGradient(0, topPointOfArrow, 0, bottomPointOfArrow, colors, positions, Shader.TileMode.MIRROR);
-
-        // ACTUALLY DRAWING THE ARROW
-        mHighlightPaint.setShader(shader);
-
-        c.drawLine(x, topPointOfArrow, x, bottomPointOfArrow, mHighlightPaint);
-
-        mHighlightPaint.setShader(null);
-
-        c.drawLine(x - arrowHeadHalfWidth, topPointOfArrowHead + arrowHeadHeight, x + basicHeight/2, topPointOfArrowHead + basicHeight/2, mHighlightPaint);
-        c.drawLine(x - basicHeight/2, topPointOfArrowHead + basicHeight/2, x + arrowHeadHalfWidth, topPointOfArrowHead + arrowHeadHeight, mHighlightPaint);
-    
-    }
-
     // TODO: why do we need to save previous drawing posision inside a highlight?
     // high.setDraw((float) pix.x, (float) pix.y);
-    // // draw the lines
-    // drawHighlightLines(c, (float) pix.x, (float) pix.y, set);
 
     /**
      * Sets the Bitmap.Config to be used by this renderer.

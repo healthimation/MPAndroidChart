@@ -548,14 +548,8 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                 MPPointD pix = trans.getPixelForValues(e.getX(), e.getY() * mAnimator
                     .getPhaseY());
                 high.setDraw((float) pix.x, (float) pix.y);
-                drawHighlightLine(c, (float) pix.x, (float) pix.y, set, mBarRect);
+                drawHighlightArrow(c, (float) pix.x, (float) pix.y, 4f, 2f, new int[]{Color.BLACK, Color.TRANSPARENT});
             }
-
-            // mHighlightPaint.setColor(set.getHighLightColor());
-            // mHighlightPaint.setAlpha(set.getHighLightAlpha());
-
-            // setHighlightDrawPos(high, mBarRect);
-            // c.drawRect(mBarRect, mHighlightPaint);
         }
     }
 
@@ -569,22 +563,5 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
     @Override
     public void drawExtras(Canvas c) {
-    }
-
-    /**
-     * Draws vertical & horizontal highlight-lines if enabled.
-     *
-     * @param c
-     * @param x x-position of the highlight line intersection
-     * @param y y-position of the highlight line intersection
-     * @param set the currently drawn dataset
-     */
-    protected void drawHighlightLine(Canvas c, float x, float y, IBarDataSet set, RectF bar) {
-
-        // set color and stroke-width
-        mHighlightPaint.setColor(set.getHighlightLineColor());
-        mHighlightPaint.setStrokeWidth(set.getHighlightLineWidth());
-        mHighlightPaint.setAlpha(set.getHighLightLineAlpha());
-        c.drawLine(x, mViewPortHandler.contentTop(), x, bar.top - set.getHighlightLineBottomMargin(), mHighlightPaint);
     }
 }
