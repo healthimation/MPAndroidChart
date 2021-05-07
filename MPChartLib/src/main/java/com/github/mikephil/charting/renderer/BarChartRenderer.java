@@ -229,6 +229,8 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
         }
     }
 
+
+    // used to create rect for stack highlight mainly
     protected void prepareBarHighlight(float x, float y1, float y2, float barWidthHalf, Transformer trans) {
 
         float left = x - barWidthHalf;
@@ -542,8 +544,10 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
             drawBarBufferContent(c, set, scale, alpha, finalBuffer);
 
+            // TODO: saved for the stacked highlight / but arrow with stacked highlight haven't been tested
             prepareBarHighlight(e.getX(), y1, y2, barWidthHalf, trans);
 
+            // TODO: should use y1 (strange name - rename) for highlight here
             if(set.getHighlightLineWidth() > 0.0) {
                 MPPointD pix = trans.getPixelForValues(e.getX(), e.getY() * mAnimator
                     .getPhaseY());
