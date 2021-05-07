@@ -548,7 +548,7 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                 MPPointD pix = trans.getPixelForValues(e.getX(), e.getY() * mAnimator
                     .getPhaseY());
                 high.setDraw((float) pix.x, (float) pix.y);
-                drawHighlightArrow(c, (float) pix.x, (float) pix.y, 4f, 2f, new int[]{Color.BLACK, Color.TRANSPARENT});
+                drawHighlightArrow(c, (float) pix.x, (float) pix.y, set, 2f);
             }
         }
     }

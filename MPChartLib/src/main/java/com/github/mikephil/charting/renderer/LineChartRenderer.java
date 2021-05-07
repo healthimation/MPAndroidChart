@@ -767,7 +767,7 @@ public class LineChartRenderer extends LineRadarRenderer {
                 MPPointD pix = mChart.getTransformer(dataSet.getAxisDependency()).getPixelForValues(entryWithHighestY.getX(), entryWithHighestY.getY() * mAnimator
                         .getPhaseY());
 
-                drawHighlightArrow(c, (float) pix.x, (float) pix.y, 4f, circleRadius + 2f, new int[]{Color.BLACK, Color.TRANSPARENT});
+                drawHighlightArrow(c, (float) pix.x, (float) pix.y, dataSet, circleRadius + 2f);
             }
         } else {
             for (Highlight high : indices) {
@@ -810,7 +810,7 @@ public class LineChartRenderer extends LineRadarRenderer {
                         mCirclePaintInner);
                 }
 
-                drawHighlightArrow(c, (float) pix.x, (float) pix.y, 4f, circleRadius + 2f, new int[]{Color.BLACK, Color.TRANSPARENT});
+                drawHighlightArrow(c, (float) pix.x, (float) pix.y, set, circleRadius + 2f);
             }
         }
     }

@@ -101,12 +101,14 @@ public abstract class BarLineScatterCandleBubbleRenderer extends DataRenderer {
 
     // WARNING: tested only with linecharts / bar charts
     // Probably need some efforts to be able to work on other charts
-    protected void drawHighlightArrow(Canvas c, float x, float y, float strokeWidth, float insetBottom, int[] colors) {
+    protected void drawHighlightArrow(Canvas c, float x, float y, IBarLineScatterCandleBubbleDataSet set, float insetBottom) {
 
         // 45 degree angle
+        float strokeWidth = set.getHighlightLineWidth();
+        int color = set.getHighLightColor();
         float basicHeight = (float) (strokeWidth / Math.sqrt(2));
 
-        mHighlightPaint.setColor(Color.BLACK);
+        mHighlightPaint.setColor(color);
         mHighlightPaint.setStrokeWidth(strokeWidth);
 
         float topPointOfArrowHead = mViewPortHandler.contentTop();
@@ -117,6 +119,7 @@ public abstract class BarLineScatterCandleBubbleRenderer extends DataRenderer {
         float arrowHeadHeight = 4f * basicHeight;
         float arrowHeadHalfWidth = 3f * basicHeight;
 
+        int[] colors = new int[]{color, Color.TRANSPARENT};
         float[] positions = new float[]{0.6f, 1f};
         Shader shader = new LinearGradient(0, topPointOfArrow, 0, bottomPointOfArrow, colors, positions, Shader.TileMode.MIRROR);
 

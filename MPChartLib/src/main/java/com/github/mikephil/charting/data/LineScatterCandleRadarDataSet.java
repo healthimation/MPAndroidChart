@@ -3,7 +3,6 @@ package com.github.mikephil.charting.data;
 import android.graphics.DashPathEffect;
 
 import com.github.mikephil.charting.interfaces.datasets.ILineScatterCandleRadarDataSet;
-import com.github.mikephil.charting.utils.Utils;
 
 import java.util.List;
 
@@ -15,16 +14,12 @@ public abstract class LineScatterCandleRadarDataSet<T extends Entry> extends Bar
     protected boolean mDrawVerticalHighlightIndicator = true;
     protected boolean mDrawHorizontalHighlightIndicator = true;
 
-    /** the width of the highlight indicator lines */
-    protected float mHighlightLineWidth = 0.5f;
-
     /** the path effect for dashed highlight-lines */
     protected DashPathEffect mHighlightDashPathEffect = null;
 
 
     public LineScatterCandleRadarDataSet(List<T> yVals, String label) {
         super(yVals, label);
-        mHighlightLineWidth = Utils.convertDpToPixel(0.5f);
     }
 
     /**
@@ -60,19 +55,6 @@ public abstract class LineScatterCandleRadarDataSet<T extends Entry> extends Bar
     @Override
     public boolean isHorizontalHighlightIndicatorEnabled() {
         return mDrawHorizontalHighlightIndicator;
-    }
-
-    /**
-     * Sets the width of the highlight line in dp.
-     * @param width
-     */
-    public void setHighlightLineWidth(float width) {
-        mHighlightLineWidth = Utils.convertDpToPixel(width);
-    }
-
-    @Override
-    public float getHighlightLineWidth() {
-        return mHighlightLineWidth;
     }
 
     /**
@@ -114,7 +96,6 @@ public abstract class LineScatterCandleRadarDataSet<T extends Entry> extends Bar
         super.copy(lineScatterCandleRadarDataSet);
         lineScatterCandleRadarDataSet.mDrawHorizontalHighlightIndicator = mDrawHorizontalHighlightIndicator;
         lineScatterCandleRadarDataSet.mDrawVerticalHighlightIndicator = mDrawVerticalHighlightIndicator;
-        lineScatterCandleRadarDataSet.mHighlightLineWidth = mHighlightLineWidth;
         lineScatterCandleRadarDataSet.mHighlightDashPathEffect = mHighlightDashPathEffect;
     }
 }

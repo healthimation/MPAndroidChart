@@ -26,7 +26,8 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
     private int mBarBorderColor = Color.BLACK;
 
     private int mHighlightLineColor = Color.BLACK;
-    private float mHighlightLineWidth = 2.0f;
+
+    // TODO: to be used later
     private float mHighlightLineBottomMargin = 2.0f;
 
     /**
@@ -80,7 +81,6 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
         barDataSet.mHighLightAlpha = mHighLightAlpha;
         barDataSet.mHighLightLineAlpha = mHighLightLineAlpha;
         barDataSet.mHighlightLineColor = mHighlightLineColor;
-        barDataSet.mHighlightLineWidth = mHighlightLineWidth;
         barDataSet.mHighlightLineBottomMargin = mHighlightLineBottomMargin;
     }
 
@@ -236,27 +236,6 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
     @Override
     public int getHighlightLineColor() {
         return mHighlightLineColor;
-    }
-
-    /**
-     * Sets the width used for drawing lines above the bars.
-     * If width == 0, no line will be drawn.
-     *
-     * @return
-     */
-    public void setHighlightLineWidth(float width) {
-        mHighlightLineWidth = width;
-    }
-
-    /**
-     * Returns the width used for drawing lines above the bars.
-     * If width == 0, no line will be drawn.
-     *
-     * @return
-     */
-    @Override
-    public float getHighlightLineWidth() {
-        return mHighlightLineWidth;
     }
 
     /**
