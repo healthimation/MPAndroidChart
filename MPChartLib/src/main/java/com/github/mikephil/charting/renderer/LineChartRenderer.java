@@ -753,6 +753,13 @@ public class LineChartRenderer extends LineRadarRenderer {
                 // -------------------- ARROW PART --------------------
                 ILineDataSet dataSet = lineData.getDataSetByIndex(high.getDataSetIndex());
                 Entry entry = dataSet.getEntryForXValue(high.getX(), high.getY());
+                // Since it's a hacky selection:
+                //  We need circleRadius to draw arrow properly (not touching the dots), but since we can have many datasets on one x value
+                //  how to make sure that circleRadius is the one that we actually need?
+                //  (from the correct dataset, to which the arrow will be connected / drawn above)
+                // ----------------------------------------------------------------
+                // Bearing the above info in midn this code assumes 
+                //  that all datasets have the same circleRadius for this x value
                 float circleRadius = dataSet.getCircleRadius() * scale;
 
                 Entry entryWithHighestY = entry;
