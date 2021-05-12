@@ -54,14 +54,6 @@ public interface IBarDataSet extends IBarLineScatterCandleBubbleDataSet<BarEntry
     int getHighLightAlpha();
 
     /**
-     * Returns the alpha value (transparency) that is used for drawing the
-     * highlight line indicator.
-     *
-     * @return
-     */
-    int getHighLightLineAlpha();
-
-    /**
      * Returns the labels used for the different value-stacks in the legend.
      * This is only relevant for stacked bar entries.
      *
@@ -76,18 +68,4 @@ public interface IBarDataSet extends IBarLineScatterCandleBubbleDataSet<BarEntry
      * @return
      */
     float getHighlightLineWidth();
-
-    /**
-     * Returns the color drawing highlight line above a selected bar.
-     *
-     * @return
-     */
-    int getHighlightLineColor();
-
-    /**
-     * Returns the bottom inset used for drawing highlight above the selected bar.
-     *
-     * @return
-     */
-    float getHighlightLineBottomMargin();
 }
