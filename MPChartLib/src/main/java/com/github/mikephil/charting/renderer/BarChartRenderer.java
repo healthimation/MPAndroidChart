@@ -165,6 +165,9 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
     protected void drawBarBufferContent(Canvas c, IBarDataSet dataSet, float scale, int alpha, float[] buffer) {
 
         final boolean isSingleColor = dataSet.getColors().size() == 1;
+        boolean isStacked = dataSet.isStacked();
+        int stackSize = isStacked ? dataSet.getStackSize() : 1;
+        boolean isRoundedCornersEnabled = dataSet.isRoundedCornersEnabled();
 
         float barBorderWidth = dataSet.getBarBorderWidth();
         final boolean drawBorder = barBorderWidth > 0.f;
@@ -180,10 +183,15 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
         for (int j = 0; j < buffer.length; j += 4) {
 
-            if (!mViewPortHandler.isInBoundsLeft(buffer[j + 2]))
+            float left = buffer[j];
+            float top = buffer[j + 1];
+            float right = buffer[j + 2];
+            float bottom = buffer[j + 3];
+
+            if (!mViewPortHandler.isInBoundsLeft(right))
                 continue;
 
-            if (!mViewPortHandler.isInBoundsRight(buffer[j]))
+            if (!mViewPortHandler.isInBoundsRight(left))
                 break;
 
             if (!isSingleColor) {
@@ -197,10 +205,10 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                 GradientColor gradientColor = dataSet.getGradientColor();
                  mRenderPaint.setShader(
                     new LinearGradient(
-                        buffer[j],
-                        buffer[j + 3],
-                        buffer[j],
-                        buffer[j + 1],
+                        left,
+                        bottom,
+                        left,
+                        top,
                         gradientColor.getStartColor(),
                         gradientColor.getEndColor(),
                         android.graphics.Shader.TileMode.MIRROR));
@@ -209,22 +217,20 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
             if (dataSet.getGradientColors() != null) {
                  mRenderPaint.setShader(
                     new LinearGradient(
-                        buffer[j],
-                        buffer[j + 3],
-                        buffer[j],
-                        buffer[j + 1],
+                        left,
+                        bottom,
+                        left,
+                        top,
                         dataSet.getGradientColor(j / 4).getStartColor(),
                         dataSet.getGradientColor(j / 4).getEndColor(),
                         android.graphics.Shader.TileMode.MIRROR));
             }
 
 
-            c.drawRect(buffer[j], buffer[j + 1], buffer[j + 2],
-                    buffer[j + 3], mRenderPaint);
+            c.drawRect(left, top, right, bottom, mRenderPaint);
 
             if (drawBorder) {
-                c.drawRect(buffer[j], buffer[j + 1], buffer[j + 2],
-                        buffer[j + 3], mBarBorderPaint);
+                c.drawRect(left, top, right, bottom, mBarBorderPaint);
             }
         }
     }
