@@ -46,6 +46,9 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
      */
     private Path mHighlightLinePath = new Path();
 
+    private Path mRoundedRectsPath = new Path();
+    private float[] radiiZeros = new float[] {0, 0, 0, 0, 0, 0, 0, 0};
+
     public BarChartRenderer(BarDataProvider chart, ChartAnimator animator,
                             ViewPortHandler viewPortHandler) {
         super(animator, viewPortHandler);
@@ -181,12 +184,40 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
             mRenderPaint.setAlpha(alpha);
         }
 
+        int stackIndexCount = 1;
+        boolean isTopRect = false;
+
         for (int j = 0; j < buffer.length; j += 4) {
+
+            isTopRect = false;
+
+            if(stackIndexCount < stackSize) {
+                stackIndexCount++;
+            } else {
+                isTopRect = true;
+                stackIndexCount = 1;
+            }
 
             float left = buffer[j];
             float top = buffer[j + 1];
             float right = buffer[j + 2];
             float bottom = buffer[j + 3];
+
+            float width = right - left;
+            float radius = 10;
+
+            // Each corner receives two radius values [X, Y]. 
+            // The corners are ordered top-left, top-right, bottom-right, bottom-left
+            // 8 float values
+            float[] radii = new float[]
+            {
+                radius, radius, 
+                radius, radius, 
+                0, 0, 
+                0, 0
+            };
+
+            float[] radiuses = isRoundedCornersEnabled && isTopRect ? radii : radiiZeros;
 
             if (!mViewPortHandler.isInBoundsLeft(right))
                 continue;
@@ -226,11 +257,13 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                         android.graphics.Shader.TileMode.MIRROR));
             }
 
-
-            c.drawRect(left, top, right, bottom, mRenderPaint);
+            mRoundedRectsPath.reset();
+            mRoundedRectsPath.addRoundRect(left, top, right, bottom, radiuses, Path.Direction.CW);
+            
+            c.drawPath(mRoundedRectsPath, mRenderPaint);
 
             if (drawBorder) {
-                c.drawRect(left, top, right, bottom, mBarBorderPaint);
+                c.drawPath(mRoundedRectsPath, mBarBorderPaint);
             }
         }
     }
