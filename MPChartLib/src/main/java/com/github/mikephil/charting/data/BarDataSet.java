@@ -30,6 +30,7 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
      */
     private int mHighLightAlpha = 120;
 
+    private float mCornerRadius = 0.f;
 
     /**
      * the overall entry count, including counting each stack-value individually
@@ -70,6 +71,7 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
         barDataSet.mBarBorderWidth = mBarBorderWidth;
         barDataSet.mStackLabels = mStackLabels;
         barDataSet.mHighLightAlpha = mHighLightAlpha;
+        barDataSet.mCornerRadius = mCornerRadius;
     }
 
     /**
@@ -220,6 +222,15 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
     @Override
     public int getHighLightAlpha() {
         return mHighLightAlpha;
+    }
+
+    public void setCornerRadius(float radius) {
+        mCornerRadius = radius;
+    }
+
+    @Override
+    public float getCornerRadius() {
+        return mCornerRadius;
     }
 
     /**

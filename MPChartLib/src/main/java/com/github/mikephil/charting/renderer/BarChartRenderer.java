@@ -46,6 +46,9 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
      */
     private Path mHighlightLinePath = new Path();
 
+    private Path mRoundedRectsPath = new Path();
+    private float[] radiiZeros = new float[] {0, 0, 0, 0, 0, 0, 0, 0};
+
     public BarChartRenderer(BarDataProvider chart, ChartAnimator animator,
                             ViewPortHandler viewPortHandler) {
         super(animator, viewPortHandler);
@@ -165,6 +168,10 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
     protected void drawBarBufferContent(Canvas c, IBarDataSet dataSet, float scale, int alpha, float[] buffer) {
 
         final boolean isSingleColor = dataSet.getColors().size() == 1;
+        boolean isStacked = dataSet.isStacked();
+        int stackSize = isStacked ? dataSet.getStackSize() : 1;
+        float radius = dataSet.getCornerRadius();
+        boolean isRoundedCornersEnabled = radius > 0.f;
 
         float barBorderWidth = dataSet.getBarBorderWidth();
         final boolean drawBorder = barBorderWidth > 0.f;
@@ -178,12 +185,54 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
             mRenderPaint.setAlpha(alpha);
         }
 
+
+        // -------- WARNING ----------
+        // @stackIndexCount is used here to allow easier detection of top rectangles (to make it rounded at the top).
+        // This way of doing the feature assumes that a dataset have constant stack size for each bar (like 3, 3, 3).
+        // The library allow a dataSet to contain different stack sizes (like 3, 1 ,2 ...), and the method getStackSize is
+        //  **** Returns the _MAXIMUM_ number of bars that can be stacked upon another in this DataSet ****
+
+        // So keep that in mind and if we ever need non constant stack size inside one dataSet, we will need to review
+        // the appropriate approach here
+        int stackIndexCount = 1;
+        boolean isTopRect = false;
+
         for (int j = 0; j < buffer.length; j += 4) {
 
-            if (!mViewPortHandler.isInBoundsLeft(buffer[j + 2]))
+            isTopRect = false;
+            
+            // helps to find the top bar
+            if(stackIndexCount < stackSize) {
+                stackIndexCount++;
+            } else {
+                isTopRect = true;
+                stackIndexCount = 1;
+            }
+
+            float left = buffer[j];
+            float top = buffer[j + 1];
+            float right = buffer[j + 2];
+            float bottom = buffer[j + 3];
+
+            float width = right - left;
+
+            // Each corner receives two radius values [X, Y]. 
+            // The corners are ordered top-left, top-right, bottom-right, bottom-left
+            // 8 float values
+            float[] radii = new float[]
+            {
+                radius, radius, // top-left
+                radius, radius, // top-right
+                0, 0, // bottom-right
+                0, 0  // bottom-left
+            };
+
+            float[] radiuses = isRoundedCornersEnabled && isTopRect ? radii : radiiZeros;
+
+            if (!mViewPortHandler.isInBoundsLeft(right))
                 continue;
 
-            if (!mViewPortHandler.isInBoundsRight(buffer[j]))
+            if (!mViewPortHandler.isInBoundsRight(left))
                 break;
 
             if (!isSingleColor) {
@@ -197,10 +246,10 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                 GradientColor gradientColor = dataSet.getGradientColor();
                  mRenderPaint.setShader(
                     new LinearGradient(
-                        buffer[j],
-                        buffer[j + 3],
-                        buffer[j],
-                        buffer[j + 1],
+                        left,
+                        bottom,
+                        left,
+                        top,
                         gradientColor.getStartColor(),
                         gradientColor.getEndColor(),
                         android.graphics.Shader.TileMode.MIRROR));
@@ -209,22 +258,22 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
             if (dataSet.getGradientColors() != null) {
                  mRenderPaint.setShader(
                     new LinearGradient(
-                        buffer[j],
-                        buffer[j + 3],
-                        buffer[j],
-                        buffer[j + 1],
+                        left,
+                        bottom,
+                        left,
+                        top,
                         dataSet.getGradientColor(j / 4).getStartColor(),
                         dataSet.getGradientColor(j / 4).getEndColor(),
                         android.graphics.Shader.TileMode.MIRROR));
             }
 
-
-            c.drawRect(buffer[j], buffer[j + 1], buffer[j + 2],
-                    buffer[j + 3], mRenderPaint);
+            mRoundedRectsPath.reset();
+            mRoundedRectsPath.addRoundRect(left, top, right, bottom, radiuses, Path.Direction.CW);
+            
+            c.drawPath(mRoundedRectsPath, mRenderPaint);
 
             if (drawBorder) {
-                c.drawRect(buffer[j], buffer[j + 1], buffer[j + 2],
-                        buffer[j + 3], mBarBorderPaint);
+                c.drawPath(mRoundedRectsPath, mBarBorderPaint);
             }
         }
     }
