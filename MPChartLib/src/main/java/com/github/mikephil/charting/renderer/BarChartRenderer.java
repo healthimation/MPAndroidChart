@@ -171,6 +171,7 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
         boolean isStacked = dataSet.isStacked();
         int stackSize = isStacked ? dataSet.getStackSize() : 1;
         boolean isRoundedCornersEnabled = dataSet.isRoundedCornersEnabled();
+        float radius = dataSet.getCornerRadius();
 
         float barBorderWidth = dataSet.getBarBorderWidth();
         final boolean drawBorder = barBorderWidth > 0.f;
@@ -184,13 +185,23 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
             mRenderPaint.setAlpha(alpha);
         }
 
+
+        // -------- WARNING ----------
+        // @stackIndexCount is used here to allow easier detection of top rectangles (to make it rounded at the top).
+        // This way of doing the feature assumes that a dataset have constant stack size for each bar (like 3, 3, 3).
+        // The library allow a dataSet to contain different stack sizes (like 3, 1 ,2 ...), and the method getStackSize is
+        //  **** Returns the _MAXIMUM_ number of bars that can be stacked upon another in this DataSet ****
+
+        // So keep that in mind and if we ever need non constant stack size inside one dataSet, we will need to review
+        // the appropriate approach here
         int stackIndexCount = 1;
         boolean isTopRect = false;
 
         for (int j = 0; j < buffer.length; j += 4) {
 
             isTopRect = false;
-
+            
+            // helps to find the top bar
             if(stackIndexCount < stackSize) {
                 stackIndexCount++;
             } else {
@@ -204,17 +215,16 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
             float bottom = buffer[j + 3];
 
             float width = right - left;
-            float radius = 10;
 
             // Each corner receives two radius values [X, Y]. 
             // The corners are ordered top-left, top-right, bottom-right, bottom-left
             // 8 float values
             float[] radii = new float[]
             {
-                radius, radius, 
-                radius, radius, 
-                0, 0, 
-                0, 0
+                radius, radius, // top-left
+                radius, radius, // top-right
+                0, 0, // bottom-right
+                0, 0  // bottom-left
             };
 
             float[] radiuses = isRoundedCornersEnabled && isTopRect ? radii : radiiZeros;

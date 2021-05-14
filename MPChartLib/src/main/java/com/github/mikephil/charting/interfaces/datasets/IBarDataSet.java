@@ -70,4 +70,5 @@ public interface IBarDataSet extends IBarLineScatterCandleBubbleDataSet<BarEntry
     float getHighlightLineWidth();
 
     boolean isRoundedCornersEnabled();
+    float getCornerRadius();
 }
