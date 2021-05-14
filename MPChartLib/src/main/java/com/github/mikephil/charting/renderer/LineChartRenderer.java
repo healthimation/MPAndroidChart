@@ -726,6 +726,8 @@ public class LineChartRenderer extends LineRadarRenderer {
         int alpha = 255;
 
         if(isGroupSelectionEnabled) {
+            // TODO: we use mRenderPaint to draw highlight here. Is that ok?
+            // we only use mHighlightPaint for the arrow
             for (Highlight high : indices) {
 
                 List<ILineDataSet> dataSets = mChart.getLineData().getDataSets();
@@ -747,6 +749,32 @@ public class LineChartRenderer extends LineRadarRenderer {
                         continue;
                     drawEntries(c, set, scale, alpha);
                 }
+
+                // -------------------- ARROW PART --------------------
+                ILineDataSet dataSet = lineData.getDataSetByIndex(high.getDataSetIndex());
+                Entry entry = dataSet.getEntryForXValue(high.getX(), high.getY());
+                // Since it's a hacky selection:
+                //  We need circleRadius to draw arrow properly (not touching the dots), but since we can have many datasets on one x value
+                //  how to make sure that circleRadius is the one that we actually need?
+                //  (from the correct dataset, to which the arrow will be connected / drawn above)
+                // ----------------------------------------------------------------
+                // Bearing the above info in midn this code assumes 
+                //  that all datasets have the same circleRadius for this x value
+                float circleRadius = dataSet.getCircleRadius() * scale;
+
+                Entry entryWithHighestY = entry;
+                for(ILineDataSet set : dataSetsWithDataBetween) {
+                    for(Entry e : set.getEntriesForXValue(entryWithHighestY.getX())) {
+                        if(e.getY() > entryWithHighestY.getY()) {
+                            entryWithHighestY = e;
+                        }
+                    }
+                }
+
+                MPPointD pix = mChart.getTransformer(dataSet.getAxisDependency()).getPixelForValues(entryWithHighestY.getX(), entryWithHighestY.getY() * mAnimator
+                        .getPhaseY());
+
+                drawHighlightArrow(c, (float) pix.x, (float) pix.y, dataSet, circleRadius + 2f);
             }
         } else {
             for (Highlight high : indices) {
@@ -788,13 +816,14 @@ public class LineChartRenderer extends LineRadarRenderer {
                         circleHoleRadius,
                         mCirclePaintInner);
                 }
+
+                drawHighlightArrow(c, (float) pix.x, (float) pix.y, set, circleRadius + 2f);
             }
         }
     }
 
+    // TODO: why do we need to save previous drawing posision inside a highlight?
     // high.setDraw((float) pix.x, (float) pix.y);
-    // // draw the lines
-    // drawHighlightLines(c, (float) pix.x, (float) pix.y, set);
 
     /**
      * Sets the Bitmap.Config to be used by this renderer.

@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.Path;
+import android.graphics.LinearGradient;
 
 import com.github.mikephil.charting.animation.ChartAnimator;
 import com.github.mikephil.charting.buffer.BarBuffer;
@@ -22,7 +23,6 @@ import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.utils.ViewPortHandler;
-import android.graphics.LinearGradient;
 import com.github.mikephil.charting.model.GradientColor;
 
 import java.util.List;
@@ -229,6 +229,8 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
         }
     }
 
+
+    // used to create rect for stack highlight mainly
     protected void prepareBarHighlight(float x, float y1, float y2, float barWidthHalf, Transformer trans) {
 
         float left = x - barWidthHalf;
@@ -542,20 +544,16 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
             drawBarBufferContent(c, set, scale, alpha, finalBuffer);
 
+            // TODO: saved for the stacked highlight / but arrow with stacked highlight haven't been tested
             prepareBarHighlight(e.getX(), y1, y2, barWidthHalf, trans);
 
+            // TODO: should use y1 (strange name - rename) for highlight here
             if(set.getHighlightLineWidth() > 0.0) {
                 MPPointD pix = trans.getPixelForValues(e.getX(), e.getY() * mAnimator
                     .getPhaseY());
                 high.setDraw((float) pix.x, (float) pix.y);
-                drawHighlightLine(c, (float) pix.x, (float) pix.y, set, mBarRect);
+                drawHighlightArrow(c, (float) pix.x, (float) pix.y, set, 2f);
             }
-
-            // mHighlightPaint.setColor(set.getHighLightColor());
-            // mHighlightPaint.setAlpha(set.getHighLightAlpha());
-
-            // setHighlightDrawPos(high, mBarRect);
-            // c.drawRect(mBarRect, mHighlightPaint);
         }
     }
 
@@ -569,22 +567,5 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
     @Override
     public void drawExtras(Canvas c) {
-    }
-
-    /**
-     * Draws vertical & horizontal highlight-lines if enabled.
-     *
-     * @param c
-     * @param x x-position of the highlight line intersection
-     * @param y y-position of the highlight line intersection
-     * @param set the currently drawn dataset
-     */
-    protected void drawHighlightLine(Canvas c, float x, float y, IBarDataSet set, RectF bar) {
-
-        // set color and stroke-width
-        mHighlightPaint.setColor(set.getHighlightLineColor());
-        mHighlightPaint.setStrokeWidth(set.getHighlightLineWidth());
-        mHighlightPaint.setAlpha(set.getHighLightLineAlpha());
-        c.drawLine(x, mViewPortHandler.contentTop(), x, bar.top - set.getHighlightLineBottomMargin(), mHighlightPaint);
     }
 }
