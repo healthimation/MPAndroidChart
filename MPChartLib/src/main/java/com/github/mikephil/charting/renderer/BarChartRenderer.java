@@ -168,9 +168,13 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
     protected void drawBarBufferContent(Canvas c, IBarDataSet dataSet, float scale, int alpha, float[] buffer) {
 
         final boolean isSingleColor = dataSet.getColors().size() == 1;
+
+        boolean isInverted = mChart.isInverted(dataSet.getAxisDependency());
         boolean isStacked = dataSet.isStacked();
         int stackSize = isStacked ? dataSet.getStackSize() : 1;
+
         float radius = dataSet.getCornerRadius();
+        float minBarHeight = dataSet.getMinBarHeight();
         boolean isRoundedCornersEnabled = radius > 0.f;
 
         float barBorderWidth = dataSet.getBarBorderWidth();
@@ -268,6 +272,11 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
             }
 
             mRoundedRectsPath.reset();
+
+            float[] clampedTopAndBottom = clampBarHeight(top, bottom, minBarHeight, isInverted);
+            top = clampedTopAndBottom[0];
+            bottom = clampedTopAndBottom[1];
+
             mRoundedRectsPath.addRoundRect(left, top, right, bottom, radiuses, Path.Direction.CW);
             
             c.drawPath(mRoundedRectsPath, mRenderPaint);
@@ -276,6 +285,18 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                 c.drawPath(mRoundedRectsPath, mBarBorderPaint);
             }
         }
+    }
+
+    // supports !inverted && y >= 0
+    // TODO: need support for other cases...
+    protected float[] clampBarHeight(float top, float bottom, float minBarHeight, boolean isInverted) {
+        
+        if(!isInverted && (top < bottom) && (bottom - top < minBarHeight)) {
+            float newTop = bottom - minBarHeight;
+            return new float[]{ newTop, bottom };
+        }
+        // return values unchanged
+        return new float[]{ top, bottom };
     }
 
 
