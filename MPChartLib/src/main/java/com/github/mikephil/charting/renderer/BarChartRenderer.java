@@ -170,8 +170,8 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
         final boolean isSingleColor = dataSet.getColors().size() == 1;
         boolean isStacked = dataSet.isStacked();
         int stackSize = isStacked ? dataSet.getStackSize() : 1;
-        boolean isRoundedCornersEnabled = dataSet.isRoundedCornersEnabled();
         float radius = dataSet.getCornerRadius();
+        boolean isRoundedCornersEnabled = radius > 0.f;
 
         float barBorderWidth = dataSet.getBarBorderWidth();
         final boolean drawBorder = barBorderWidth > 0.f;

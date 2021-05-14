@@ -30,8 +30,7 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
      */
     private int mHighLightAlpha = 120;
 
-    private boolean mRoundedCorners = false;
-    private float mCornerRadius = 2.0f;
+    private float mCornerRadius = 0.f;
 
     /**
      * the overall entry count, including counting each stack-value individually
@@ -72,7 +71,6 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
         barDataSet.mBarBorderWidth = mBarBorderWidth;
         barDataSet.mStackLabels = mStackLabels;
         barDataSet.mHighLightAlpha = mHighLightAlpha;
-        barDataSet.mRoundedCorners = mRoundedCorners;
         barDataSet.mCornerRadius = mCornerRadius;
     }
 
@@ -224,15 +222,6 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
     @Override
     public int getHighLightAlpha() {
         return mHighLightAlpha;
-    }
-
-    public void setRoundedCornersEnabled(boolean enabled) {
-        mRoundedCorners = enabled;
-    }
-
-    @Override
-    public boolean isRoundedCornersEnabled() {
-        return mRoundedCorners;
     }
 
     public void setCornerRadius(float radius) {
