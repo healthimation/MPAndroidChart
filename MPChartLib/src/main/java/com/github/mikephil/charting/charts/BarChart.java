@@ -31,8 +31,9 @@ import com.github.mikephil.charting.utils.Utils;
 
 import java.util.List;
 
-import static com.github.mikephil.charting.utils.Utils.getDataSetIndex;
-import static com.github.mikephil.charting.utils.Utils.getEntryIndex;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getDataSetIndex;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getEntryIndex;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.rectFtoRect;
 
 /**
  * Chart that draws bars.
@@ -224,7 +225,7 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
 
         getTransformer(set.getAxisDependency()).rectValueToPixel(bounds);
 
-        Rect rect = Utils.rectFtoRect(bounds);
+        Rect rect = rectFtoRect(bounds);
         rect.top = (int) top;
         rect.bottom = (int) bottom;
         return rect;

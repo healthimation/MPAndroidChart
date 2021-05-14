@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
@@ -18,20 +19,29 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.accessibility.ExploreByTouchHelper;
+import com.github.mikephil.charting.accessibility.FocusedEntry;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.renderer.LineChartRenderer;
 import com.github.mikephil.charting.utils.MPPointD;
-import com.github.mikephil.charting.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.mikephil.charting.utils.Utils.getDataSetIndex;
-import static com.github.mikephil.charting.utils.Utils.getEntryIndex;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.countOfDataSetsByX;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getDataSetIndex;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getDateSetsByX;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getEntryIndex;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getFocusedEntry;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getMaxYFromDataSets;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getMinYFromDataSets;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.rectFtoRect;
 
 /**
  * Chart that draws lines, surfaces, circles, ...
@@ -39,6 +49,8 @@ import static com.github.mikephil.charting.utils.Utils.getEntryIndex;
  * @author Philipp Jahoda
  */
 public class LineChart extends BarLineChartBase<LineData> implements LineDataProvider {
+
+    private int entryCount = -1;
 
     /**
      * flag that indicates if group selection is on
@@ -77,6 +89,7 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
     @Override
     public void setData(LineData data) {
         super.setData(data);
+        entryCount = -1;
 
         if (mData != null) {
             mLineGraphAccessHelper = new LineGraphAccessHelper(this);
@@ -110,31 +123,51 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
         super.onDetachedFromWindow();
     }
 
+    private MPPointD transformer(float x, float y, ILineDataSet set) {
+        return getTransformer(set.getAxisDependency()).getPixelForValues(x, y * mAnimator.getPhaseY());
+    }
+
     public Rect getLineBoundsByIndex(int index, Rect outputRect) {
         RectF bounds = new RectF(outputRect);
-
         if (mData == null) {
             bounds.set(Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE);
             return new Rect(Math.round(bounds.left),Math.round(bounds.top), Math.round(bounds.right), Math.round(bounds.bottom));
         }
-
-        int dataSetIndex = getDataSetIndex(index, mData);
-        ILineDataSet set = mData.getDataSetByIndex(dataSetIndex);
-        Entry e = set.getEntryForIndex(getEntryIndex(dataSetIndex, index, mData));
-        float x = e.getX();
+        Entry e;
+        float x;
+        ILineDataSet set = null;
+        MPPointD pix = null;
+        if (mGroupSelectionEnabled) {
+            x = (float) countOfDataSetsByX(mData).toArray()[index];
+            for(ILineDataSet dataSet : mData.getDataSets()) {
+                if(dataSet.containsEntriesAtXValue(x, x)) {
+                    set = dataSet;
+                    break;
+                }
+            }
+        } else {
+            int dataSetIndex = getDataSetIndex(index, mData);
+            set = mData.getDataSetByIndex(dataSetIndex);
+            e = set.getEntryForIndex(getEntryIndex(dataSetIndex, index, mData));
+            x = e.getX();
+            pix = transformer(e.getX(), e.getY(), set);
+        }
         float barWidthHalf = 1f / 2f;
-        MPPointD pix = getTransformer(set.getAxisDependency()).getPixelForValues(e.getX(), e.getY() * mAnimator
-                .getPhaseY());
+
+        List<IDataSet> dataSetsWithDataBetween = getDateSetsByX(x, mData);
+        float minGroupY = (float) transformer(x, getMinYFromDataSets(dataSetsWithDataBetween), set).y;
+        float maxGroupY = (float) transformer(x, getMaxYFromDataSets(dataSetsWithDataBetween), set).y;
+
         float left = x - barWidthHalf;
         float right = x + barWidthHalf;
-        float top = (float) pix.y - 30f;
-        float bottom = (float) pix.y + 30f;
+        float top = mGroupSelectionEnabled ? maxGroupY - 30f : (float) pix.y - 30f;
+        float bottom = mGroupSelectionEnabled ? minGroupY + 30f  : (float) pix.y + 30f;
 
         bounds.set(left, top, right, bottom);
 
         getTransformer(set.getAxisDependency()).rectValueToPixel(bounds);
 
-        Rect rect = Utils.rectFtoRect(bounds);
+        Rect rect = rectFtoRect(bounds);
         rect.top = (int) top;
         rect.bottom = (int) bottom;
         return rect;
@@ -158,7 +191,17 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
             if (mData != null) {
                 int index = -1;
                 for (int i = 0; i < mData.getDataSets().size(); i++) {
-                    index = mData.getDataSetByIndex(i).getEntryIndex(x, y, DataSet.Rounding.DOWN);
+                    if (mGroupSelectionEnabled) {
+                        List<ILineDataSet> dataSetsWithDataBetween = new ArrayList<>();
+                        if (mData.getDataSetByIndex(i).containsEntriesAtXValue(x, x)) {
+                            dataSetsWithDataBetween.add(mData.getDataSetByIndex(i));
+                            continue;
+                        } else {
+                            index = i - dataSetsWithDataBetween.size() - 1;
+                        }
+                    } else {
+                        index = mData.getDataSetByIndex(i).getEntryIndex(x, y, DataSet.Rounding.DOWN);
+                    }
                     if (index != -1) break;
                 }
                 if (index >= 0) {
@@ -168,22 +211,30 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
             return ExploreByTouchHelper.INVALID_ID;
         }
 
-        @Override
-        protected void getVisibleVirtualViewIds(List<Integer> virtualViewIds) {
+        private void calculateEntryCount() {
             if (mData != null) {
-                int count = mData.getEntryCount();
-                for (int index = count - 1; index >= 0; index--) {
-                    virtualViewIds.add(index);
+                if (mGroupSelectionEnabled) {
+                    entryCount = countOfDataSetsByX(mData).size();
+                } else {
+                    entryCount = mData.getEntryCount();
                 }
             }
+        }
 
+        @Override
+        protected void getVisibleVirtualViewIds(List<Integer> virtualViewIds) {
+            if (entryCount == -1) {
+                calculateEntryCount();
+            }
+            for (int index = entryCount - 1; index >= 0; index--) {
+                virtualViewIds.add(index);
+            }
         }
 
         private CharSequence getDescriptionForIndex(int index, AccessibilityNodeInfoCompat node) {
             if (mData != null) {
-                int dataSetIndex = getDataSetIndex(index, mData);
-                int entryIndex = getEntryIndex(dataSetIndex, index, mData);
-                Entry e = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
+                FocusedEntry focusedEntry = getFocusedEntry(mGroupSelectionEnabled, mData, index);
+                Entry e = focusedEntry.getEntry();
                 node.setSelected(valuesToHighlight() && getHighlighted()[0].getX() == e.getX());
                 return e.getAccessibilityLabel();
             }
@@ -216,12 +267,11 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
         protected boolean performActionForVirtualViewId(
                 int virtualViewId, int action, Bundle arguments) {
             if (mData != null && virtualViewId > 0) {
-                int dataSetIndex = getDataSetIndex(virtualViewId, mData);
-                int entryIndex = getEntryIndex(dataSetIndex, virtualViewId, mData);
-                Entry entry = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
                 switch (action) {
                     case AccessibilityNodeInfoCompat.ACTION_CLICK:
-                        Highlight high = new Highlight(entry.getX(), entry.getY(), dataSetIndex);
+                        FocusedEntry focusedEntry = getFocusedEntry(mGroupSelectionEnabled, mData, virtualViewId);
+                        Entry entry = focusedEntry.getEntry();
+                        Highlight high = new Highlight(entry.getX(), entry.getY(), focusedEntry.getDataSetIndex());
                         highlightValue(high);
                         mSelectionListener.onValueSelected(entry, high);
                         AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId);

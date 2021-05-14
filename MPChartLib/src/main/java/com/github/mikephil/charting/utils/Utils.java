@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Layout;
@@ -19,8 +18,6 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 
-import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet;
-import com.github.mikephil.charting.data.ChartData;
 import com.github.mikephil.charting.formatter.DefaultValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
@@ -774,38 +771,5 @@ public abstract class Utils {
 
     public static int getSDKInt() {
         return android.os.Build.VERSION.SDK_INT;
-    }
-
-    public static Rect rectFtoRect(RectF rectF) {
-        Rect rect = new Rect();
-        rect.left = (int) rectF.left;
-        rect.right = (int) rectF.right;
-        rect.top = (int) rectF.top;
-        rect.bottom = (int) rectF.bottom;
-        return rect;
-    }
-
-    public static int getDataSetIndex(int index, ChartData mData) {
-        int size = index;
-        for (int i = 0; i < mData.getDataSets().size(); i++) {
-            if (size == 0) return i;
-            int dataSetSize = ((BarLineScatterCandleBubbleDataSet)mData.getDataSets().get(i)).getValues().size();
-            if (dataSetSize <= size) {
-                size -= dataSetSize;
-            } else {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    public static int getEntryIndex(int dataSetIndex, int index, ChartData mData) {
-        int size = -1;
-        if (dataSetIndex == 0) return index;
-        for (int i = 0; i <= dataSetIndex; i++) {
-            size += ((BarLineScatterCandleBubbleDataSet)mData.getDataSets().get(i)).getValues().size();
-        }
-
-        return size - index;
     }
 }
