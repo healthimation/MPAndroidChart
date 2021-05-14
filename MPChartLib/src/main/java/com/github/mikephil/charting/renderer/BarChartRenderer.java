@@ -289,6 +289,7 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
 
     // supports !inverted && y >= 0
     // TODO: need support for other cases...
+    // returned array should contain new top at the first place  
     protected float[] clampBarHeight(float top, float bottom, float minBarHeight, boolean isInverted) {
         
         if(!isInverted && (top < bottom) && (bottom - top < minBarHeight)) {
