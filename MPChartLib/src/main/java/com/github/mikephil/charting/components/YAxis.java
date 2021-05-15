@@ -403,8 +403,8 @@ public class YAxis extends AxisBase {
     @Override
     public void calculate(float dataMin, float dataMax) {
 
-        float min = dataMin;
-        float max = dataMax;
+        float min = mCustomAxisMin ? this.mAxisMinimum : dataMin;
+        float max = mCustomAxisMax ? this.mAxisMaximum : dataMax;
 
         float range = Math.abs(max - min);
 
