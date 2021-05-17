@@ -88,7 +88,8 @@ public abstract class AccessibilityUtils {
         Entry entry = null;
         int dataSetIndex = 0;
         if (mGroupSelectionEnabled) {
-            float x = (float) countOfDataSetsByX(mData).toArray()[viewIndex];
+            Object[] countOfDataSetsByX = countOfDataSetsByX(mData).toArray();
+            float x = (float) (countOfDataSetsByX.length <= viewIndex ? countOfDataSetsByX[0] : countOfDataSetsByX[viewIndex]);
             for(int i=0; i< mData.getDataSets().size(); i++) {
                 ILineDataSet set = (ILineDataSet) mData.getDataSets().get(i);
                 if(set.containsEntriesAtXValue(x, x)) {

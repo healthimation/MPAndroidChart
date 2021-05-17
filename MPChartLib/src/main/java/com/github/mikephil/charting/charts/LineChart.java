@@ -8,7 +8,6 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
@@ -20,7 +19,6 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.accessibility.ExploreByTouchHelper;
 import com.github.mikephil.charting.accessibility.FocusedEntry;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -138,7 +136,8 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
         ILineDataSet set = null;
         MPPointD pix = null;
         if (mGroupSelectionEnabled) {
-            x = (float) countOfDataSetsByX(mData).toArray()[index];
+            Object[] countOfDataSetsByX = countOfDataSetsByX(mData).toArray();
+            x = (float) (countOfDataSetsByX.length <= index ? countOfDataSetsByX[0] : countOfDataSetsByX[index]);
             for(ILineDataSet dataSet : mData.getDataSets()) {
                 if(dataSet.containsEntriesAtXValue(x, x)) {
                     set = dataSet;
