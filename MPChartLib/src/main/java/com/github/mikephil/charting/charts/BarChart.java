@@ -27,7 +27,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.renderer.BarChartRenderer;
-import com.github.mikephil.charting.utils.Utils;
+import com.github.mikephil.charting.utils.MPPointD;
 
 import java.util.List;
 
@@ -412,14 +412,15 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
         protected boolean performActionForVirtualViewId(
                 int virtualViewId, int action, Bundle arguments) {
             if (mData != null && virtualViewId > 0) {
-                int dataSetIndex = getDataSetIndex(virtualViewId, mData);
-                int entryIndex = getEntryIndex(dataSetIndex, virtualViewId, mData);
-                BarEntry entry = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
                 switch (action) {
                     case AccessibilityNodeInfoCompat.ACTION_CLICK:
-                        Highlight high = new Highlight(entry.getX(), entry.getY(), dataSetIndex);
-                        highlightValue(high);
-                        mSelectionListener.onValueSelected(entry, high);
+                        int dataSetIndex = getDataSetIndex(virtualViewId, mData);
+                        int entryIndex = getEntryIndex(dataSetIndex, virtualViewId, mData);
+                        IBarDataSet set = mData.getDataSetByIndex(dataSetIndex);
+                        BarEntry entry = set.getEntryForIndex(entryIndex);
+                        MPPointD pixels = getTransformer(set.getAxisDependency()).getPixelForValues(entry.getX(), entry.getY());
+                        Highlight high = getHighlighter().getHighlight((float) pixels.x, (float) pixels.y);
+                        highlightValue(high, true);
                         AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId);
                         CharSequence accessibilityLabel = getDescriptionForIndex(virtualViewId, node);
                         getRootView().announceForAccessibility(getContext().getText(R.string.selected) + ", " + accessibilityLabel);
