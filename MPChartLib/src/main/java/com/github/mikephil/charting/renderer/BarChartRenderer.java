@@ -232,11 +232,12 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
             };
 
             float[] radiuses = isRoundedCornersEnabled && isTopRect ? radii : radiiZeros;
+            float xCoord = (right + left) / 2;
 
-            if (!mViewPortHandler.isInBoundsLeft(right))
+            if (!mViewPortHandler.isInBoundsLeft(xCoord))
                 continue;
 
-            if (!mViewPortHandler.isInBoundsRight(left))
+            if (!mViewPortHandler.isInBoundsRight(xCoord))
                 break;
 
             if (!isSingleColor) {
