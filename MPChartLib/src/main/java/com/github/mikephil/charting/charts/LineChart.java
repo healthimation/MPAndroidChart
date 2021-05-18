@@ -270,9 +270,10 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
                     case AccessibilityNodeInfoCompat.ACTION_CLICK:
                         FocusedEntry focusedEntry = getFocusedEntry(mGroupSelectionEnabled, mData, virtualViewId);
                         Entry entry = focusedEntry.getEntry();
-                        Highlight high = new Highlight(entry.getX(), entry.getY(), focusedEntry.getDataSetIndex());
-                        highlightValue(high);
-                        mSelectionListener.onValueSelected(entry, high);
+                        ILineDataSet set = focusedEntry.getSet();
+                        MPPointD pixels = getTransformer(set.getAxisDependency()).getPixelForValues(entry.getX(), entry.getY());
+                        Highlight high = getHighlighter().getHighlight((float) pixels.x, (float) pixels.y);
+                        highlightValue(high, true);
                         AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId);
                         CharSequence accessibilityLabel = getDescriptionForIndex(virtualViewId, node);
                         getRootView().announceForAccessibility(getContext().getText(R.string.selected)+ ", " + accessibilityLabel);

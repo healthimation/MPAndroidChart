@@ -87,11 +87,12 @@ public abstract class AccessibilityUtils {
     public static FocusedEntry getFocusedEntry(boolean mGroupSelectionEnabled, ChartData mData, int viewIndex) {
         Entry entry = null;
         int dataSetIndex = 0;
+        ILineDataSet set = null;
         if (mGroupSelectionEnabled) {
             Object[] countOfDataSetsByX = countOfDataSetsByX(mData).toArray();
             float x = (float) (countOfDataSetsByX.length <= viewIndex ? countOfDataSetsByX[0] : countOfDataSetsByX[viewIndex]);
             for(int i=0; i< mData.getDataSets().size(); i++) {
-                ILineDataSet set = (ILineDataSet) mData.getDataSets().get(i);
+                set = (ILineDataSet) mData.getDataSets().get(i);
                 if(set.containsEntriesAtXValue(x, x)) {
                     entry = set.getEntryForIndex(0);
                     dataSetIndex = i;
@@ -103,6 +104,6 @@ public abstract class AccessibilityUtils {
             int entryIndex = getEntryIndex(dataSetIndex, viewIndex, mData);
             entry = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
         }
-        return new FocusedEntry(entry, dataSetIndex);
+        return new FocusedEntry(entry, dataSetIndex, set);
     }
 }
