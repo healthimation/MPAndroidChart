@@ -27,7 +27,7 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.renderer.BarChartRenderer;
-import com.github.mikephil.charting.utils.Utils;
+import com.github.mikephil.charting.utils.MPPointD;
 
 import java.util.List;
 
@@ -375,7 +375,8 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
 
         }
 
-        private CharSequence getDescriptionForIndex(int index, AccessibilityNodeInfoCompat node) {
+        @Override
+        protected CharSequence getDescriptionForIndex(int index, AccessibilityNodeInfoCompat node) {
             if (mData != null) {
                 int dataSetIndex = getDataSetIndex(index, mData);
                 int entryIndex = getEntryIndex(dataSetIndex, index, mData);
@@ -409,25 +410,19 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
 
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
         @Override
-        protected boolean performActionForVirtualViewId(
-                int virtualViewId, int action, Bundle arguments) {
-            if (mData != null && virtualViewId > 0) {
-                int dataSetIndex = getDataSetIndex(virtualViewId, mData);
-                int entryIndex = getEntryIndex(dataSetIndex, virtualViewId, mData);
-                BarEntry entry = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
-                switch (action) {
-                    case AccessibilityNodeInfoCompat.ACTION_CLICK:
-                        Highlight high = new Highlight(entry.getX(), entry.getY(), dataSetIndex);
-                        highlightValue(high);
-                        mSelectionListener.onValueSelected(entry, high);
-                        AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId);
-                        CharSequence accessibilityLabel = getDescriptionForIndex(virtualViewId, node);
-                        getRootView().announceForAccessibility(getContext().getText(R.string.selected) + ", " + accessibilityLabel);
-                        return true;
-                    case AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS:
-                        accessibilityPerformActions.clearAccessibilityFocus(virtualViewId, mData.getEntryCount());
-                        return true;
-                }
+        protected boolean performActionForVirtualViewId(int virtualViewId, int action, Bundle arguments) {
+            if (mData != null && virtualViewId > 0) return false;
+
+            switch (action) {
+                case AccessibilityNodeInfoCompat.ACTION_CLICK:
+                    accessibilityClickAction(virtualViewId,
+                            getAccessibilityLabelForVirtualViewId(getRootView(), virtualViewId),
+                            false
+                    );
+                    return true;
+                case AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS:
+                    accessibilityPerformActions.clearAccessibilityFocus(virtualViewId, mData.getEntryCount());
+                    return true;
             }
             return false;
         }

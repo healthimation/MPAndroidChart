@@ -623,4 +623,11 @@ public abstract class ExploreByTouchHelper extends AccessibilityDelegateCompat {
      */
     protected abstract boolean performActionForVirtualViewId(
             int virtualViewId, int action, Bundle arguments);
+
+    protected abstract CharSequence getDescriptionForIndex(int index, AccessibilityNodeInfoCompat node);
+
+    protected CharSequence getAccessibilityLabelForVirtualViewId(View rootView, int virtualViewId) {
+        AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(rootView, virtualViewId);
+        return getDescriptionForIndex(virtualViewId, node);
+    }
 }
