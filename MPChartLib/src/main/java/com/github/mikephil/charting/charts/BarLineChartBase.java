@@ -10,10 +10,16 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.RectF;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import androidx.annotation.RequiresApi;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+
+import com.github.mikephil.charting.R;
+import com.github.mikephil.charting.accessibility.FocusedEntry;
 import com.github.mikephil.charting.components.XAxis.XAxisPosition;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.components.YAxis.AxisDependency;
@@ -23,6 +29,8 @@ import com.github.mikephil.charting.highlight.ChartHighlighter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.BarLineScatterCandleBubbleDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarLineScatterCandleBubbleDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.jobs.AnimatedMoveViewJob;
 import com.github.mikephil.charting.jobs.AnimatedZoomJob;
 import com.github.mikephil.charting.jobs.MoveViewJob;
@@ -35,6 +43,10 @@ import com.github.mikephil.charting.utils.MPPointD;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
+
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getDataSetIndex;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getEntryIndex;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getFocusedEntry;
 
 /**
  * Base-class of LineChart, BarChart, ScatterChart and CandleStickChart.
@@ -1706,5 +1718,16 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         } else {
             mViewPortHandler.refresh(mViewPortHandler.getMatrixTouch(), this, true);
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    protected void accessibilityClickAction(int virtualViewId, CharSequence descriptionForIndex, boolean mGroupSelectionEnabled) {
+        FocusedEntry focusedEntry = getFocusedEntry(mGroupSelectionEnabled, mData, virtualViewId);
+        Entry entry = focusedEntry.getEntry();
+        ILineDataSet set = focusedEntry.getSet();
+        MPPointD pixels = getTransformer(set.getAxisDependency()).getPixelForValues(entry.getX(), entry.getY());
+        Highlight high = getHighlighter().getHighlight((float) pixels.x, (float) pixels.y);
+        highlightValue(high, true);
+        getRootView().announceForAccessibility(getContext().getText(R.string.selected)+ ", " + descriptionForIndex);
     }
 }

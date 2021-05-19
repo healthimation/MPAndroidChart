@@ -230,7 +230,8 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
             }
         }
 
-        private CharSequence getDescriptionForIndex(int index, AccessibilityNodeInfoCompat node) {
+        @Override
+        protected CharSequence getDescriptionForIndex(int index, AccessibilityNodeInfoCompat node) {
             if (mData != null) {
                 FocusedEntry focusedEntry = getFocusedEntry(mGroupSelectionEnabled, mData, index);
                 Entry e = focusedEntry.getEntry();
@@ -263,25 +264,19 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
 
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
         @Override
-        protected boolean performActionForVirtualViewId(
-                int virtualViewId, int action, Bundle arguments) {
-            if (mData != null && virtualViewId > 0) {
-                switch (action) {
-                    case AccessibilityNodeInfoCompat.ACTION_CLICK:
-                        FocusedEntry focusedEntry = getFocusedEntry(mGroupSelectionEnabled, mData, virtualViewId);
-                        Entry entry = focusedEntry.getEntry();
-                        ILineDataSet set = focusedEntry.getSet();
-                        MPPointD pixels = getTransformer(set.getAxisDependency()).getPixelForValues(entry.getX(), entry.getY());
-                        Highlight high = getHighlighter().getHighlight((float) pixels.x, (float) pixels.y);
-                        highlightValue(high, true);
-                        AccessibilityNodeInfoCompat node = AccessibilityNodeInfoCompat.obtain(getRootView(), virtualViewId);
-                        CharSequence accessibilityLabel = getDescriptionForIndex(virtualViewId, node);
-                        getRootView().announceForAccessibility(getContext().getText(R.string.selected)+ ", " + accessibilityLabel);
-                        return true;
-                    case AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS:
-                        accessibilityPerformActions.clearAccessibilityFocus(virtualViewId, mData.getEntryCount());
-                        return true;
-                }
+        protected boolean performActionForVirtualViewId(int virtualViewId, int action, Bundle arguments) {
+            if (mData != null && virtualViewId > 0) return false;
+
+            switch (action) {
+                case AccessibilityNodeInfoCompat.ACTION_CLICK:
+                    accessibilityClickAction(virtualViewId,
+                            getAccessibilityLabelForVirtualViewId(getRootView(), virtualViewId),
+                            mGroupSelectionEnabled
+                    );
+                    return true;
+                case AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS:
+                    accessibilityPerformActions.clearAccessibilityFocus(virtualViewId, mData.getEntryCount());
+                    return true;
             }
             return false;
         }
