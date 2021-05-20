@@ -28,6 +28,8 @@ import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.renderer.LineChartRenderer;
 import com.github.mikephil.charting.utils.MPPointD;
+import com.github.mikephil.charting.highlight.GroupLineHighlighter;
+import com.github.mikephil.charting.highlight.ChartHighlighter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +59,11 @@ public class LineChart extends BarLineChartBase<LineData> implements LineDataPro
 
     public void setGroupSelectionEnabled(boolean enabled) {
         mGroupSelectionEnabled = enabled;
+        if(enabled) {
+            setHighlighter(new GroupLineHighlighter(this));
+        } else {
+            setHighlighter(new ChartHighlighter(this));
+        }
     }
 
     public boolean isGroupSelectionEnabled() {

@@ -177,6 +177,9 @@ public class ChartHighlighter<T extends BarLineScatterCandleBubbleDataProvider> 
             return highlights;
 
         for (Entry e : entries) {
+            
+            if(!isInBoundsX(e.getX())) continue;
+
             MPPointD pixels = mChart.getTransformer(
                     set.getAxisDependency()).getPixelForValues(e.getX(), e.getY());
 
@@ -242,5 +245,18 @@ public class ChartHighlighter<T extends BarLineScatterCandleBubbleDataProvider> 
 
     protected BarLineScatterCandleBubbleData getData() {
         return mChart.getData();
+    }
+
+    // TODO: maybe include x === maxX || x === minX ?
+    // The next is how it's done in ViewPortHandler's isInBoundsLeft - return mContentRect.left <= x + 1;
+    protected boolean isInBoundsX(float x) {
+
+        float minX = mChart.getLowestVisibleX();
+        float maxX = mChart.getHighestVisibleX();
+
+        if(x < maxX && x > minX) {
+            return true;
+        }
+        return false;
     }
 }
