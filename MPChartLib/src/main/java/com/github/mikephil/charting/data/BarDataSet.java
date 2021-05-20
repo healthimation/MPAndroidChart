@@ -76,6 +76,25 @@ public class BarDataSet extends BarLineScatterCandleBubbleDataSet<BarEntry> impl
         barDataSet.mMinBarHeight = mMinBarHeight;
     }
 
+    @Override
+    public void calcMinMaxY(float fromX, float toX) {
+
+        if (mValues == null || mValues.isEmpty())
+            return;
+
+        mYMax = -Float.MAX_VALUE;
+        mYMin = Float.MAX_VALUE;
+
+        int indexFrom = getEntryIndex(fromX, Float.NaN, Rounding.UP);
+        int indexTo = getEntryIndex(toX, Float.NaN, Rounding.DOWN);
+
+        for (int i = indexFrom; i <= indexTo; i++) {
+
+            // only recalculate y
+            calcMinMaxY(mValues.get(i));
+        }
+    }
+
     /**
      * Calculates the total number of entries this DataSet represents, including
      * stacks. All values belonging to a stack are calculated separately.
