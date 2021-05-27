@@ -4,13 +4,18 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 import com.github.mikephil.charting.accessibility.FocusedEntry;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.BarLineScatterCandleBubbleDataSet;
 import com.github.mikephil.charting.data.ChartData;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -105,5 +110,30 @@ public abstract class AccessibilityUtils {
             entry = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
         }
         return new FocusedEntry(entry, dataSetIndex, set);
+    }
+
+    public static List<BarEntry> getAllDataSetsSortedByX(BarData mData) {
+        List<BarEntry> list = new ArrayList<>();
+        for (IBarDataSet set: mData.getDataSets()) {
+            for (int i = 0; i < set.getEntryCount(); i++) {
+                list.add(set.getEntryForIndex(i));
+            }
+        }
+        Collections.sort(list, new Comparator<BarEntry>() {
+            @Override
+            public int compare(BarEntry entry1, BarEntry entry2) {
+                return Float.compare(entry1.getX(), entry2.getX());
+            }
+        });
+        return list;
+    }
+
+    public static int getBarEntryIndexByX(List<BarEntry> entries, float x) {
+        for (int i = 0; i<entries.size(); i++) {
+            if (entries.get(i).getX() == x) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
