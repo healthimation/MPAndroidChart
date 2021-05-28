@@ -16,23 +16,21 @@ import androidx.annotation.RequiresApi;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
-import com.github.mikephil.charting.R;
 import com.github.mikephil.charting.accessibility.ExploreByTouchHelper;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.highlight.BarHighlighter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.dataprovider.BarDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.renderer.BarChartRenderer;
-import com.github.mikephil.charting.utils.MPPointD;
 
 import java.util.List;
 
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getAllDataSetsSortedByX;
+import static com.github.mikephil.charting.utils.AccessibilityUtils.getBarEntryIndexByX;
 import static com.github.mikephil.charting.utils.AccessibilityUtils.getDataSetIndex;
-import static com.github.mikephil.charting.utils.AccessibilityUtils.getEntryIndex;
 import static com.github.mikephil.charting.utils.AccessibilityUtils.rectFtoRect;
 
 /**
@@ -211,7 +209,8 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
 
         int dataSetIndex = getDataSetIndex(index, mData);
         IBarDataSet set = mData.getDataSetByIndex(dataSetIndex);
-        BarEntry e = set.getEntryForIndex(getEntryIndex(dataSetIndex, index, mData));
+        List<BarEntry> entries = getAllDataSetsSortedByX(mData);
+        BarEntry e = entries.get(index);
         float x = e.getX();
 
         float barWidthHalf = mData.getBarWidth() / 2f;
@@ -352,11 +351,8 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
         protected int getVirtualViewIdAt(float x, float y) {
             // We already map (x,y) to bar index for onTouchEvent().
             if (mData != null) {
-                int index = -1;
-                for (int i = 0; i < mData.getDataSets().size(); i++) {
-                    index = mData.getDataSetByIndex(i).getEntryIndex(x, y, DataSet.Rounding.DOWN);
-                    if (index != -1) break;
-                }
+                List<BarEntry> entries = getAllDataSetsSortedByX(mData);
+                int index = getBarEntryIndexByX(entries, x);
                 if (index >= 0) {
                     return index;
                 }
@@ -378,9 +374,8 @@ public class BarChart extends BarLineChartBase<BarData> implements BarDataProvid
         @Override
         protected CharSequence getDescriptionForIndex(int index, AccessibilityNodeInfoCompat node) {
             if (mData != null) {
-                int dataSetIndex = getDataSetIndex(index, mData);
-                int entryIndex = getEntryIndex(dataSetIndex, index, mData);
-                BarEntry e = mData.getDataSetByIndex(dataSetIndex).getEntryForIndex(entryIndex);
+                List<BarEntry> entries = getAllDataSetsSortedByX(mData);
+                BarEntry e = entries.get(index);
                 node.setSelected(valuesToHighlight() && getHighlighted()[0].getX() == e.getX());
                 return e.getAccessibilityLabel();
             }
