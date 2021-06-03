@@ -16,9 +16,9 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 public abstract class AccessibilityUtils {
     public static Rect rectFtoRect(RectF rectF) {
@@ -55,7 +55,12 @@ public abstract class AccessibilityUtils {
     }
 
     public static Set<Float> countOfDataSetsByX(ChartData mData) {
-        Set<Float> countOfDataSetsByX = new HashSet<>();
+        Set<Float> countOfDataSetsByX = new TreeSet<>(new Comparator<Float>() {
+            @Override
+            public int compare(Float f1, Float f2) {
+                return Float.compare(f1, f2);
+            }
+        });
         for (Object dataSet : mData.getDataSets()) {
             float x = ((IDataSet)dataSet).getEntryForIndex(0).getX();
             countOfDataSetsByX.add(x);
