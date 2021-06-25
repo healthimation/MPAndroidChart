@@ -400,6 +400,9 @@ public class YAxis extends AxisBase {
     }
 
 
+    /**
+     * Calculates Axis Min Max and Range
+     */
     @Override
     public void calculate(float dataMin, float dataMax) {
 
