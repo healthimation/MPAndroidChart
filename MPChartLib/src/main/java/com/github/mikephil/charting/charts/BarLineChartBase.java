@@ -291,9 +291,9 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         if (mAxisRight.isEnabled() && !mAxisRight.isDrawLimitLinesBehindDataEnabled())
             mAxisRendererRight.renderLimitLines(canvas);
 
-        mXAxisRenderer.renderAxisLabels(canvas);
-        mAxisRendererLeft.renderAxisLabels(canvas);
-        mAxisRendererRight.renderAxisLabels(canvas);
+        mXAxisRenderer.renderAxisLabels(canvas, false);
+        mAxisRendererLeft.renderAxisLabels(canvas, true);
+        mAxisRendererRight.renderAxisLabels(canvas, true);
 
         if (isClipValuesToContentEnabled()) {
             clipRestoreCount = canvas.save();
@@ -392,15 +392,6 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         mXAxis.calculate(mData.getXMin(), mData.getXMax());
 
         // calculate axis range (min / max) according to provided data
-
-        // if (mAxisLeft.isEnabled())
-        //     mAxisLeft.calculate(mData.getYMin(AxisDependency.LEFT),
-        //             mData.getYMax(AxisDependency.LEFT));
-
-        // if (mAxisRight.isEnabled())
-        //     mAxisRight.calculate(mData.getYMin(AxisDependency.RIGHT),
-        //             mData.getYMax(AxisDependency.RIGHT));
-
         mAxisLeft.calculate(mData.getYMin(AxisDependency.LEFT), mData.getYMax(AxisDependency.LEFT));
         mAxisRight.calculate(mData.getYMin(AxisDependency.RIGHT), mData.getYMax(AxisDependency.RIGHT));
 

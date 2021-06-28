@@ -143,7 +143,7 @@ public class YAxisRendererRadarChart extends YAxisRenderer {
     }
 
     @Override
-    public void renderAxisLabels(Canvas c) {
+    public void renderAxisLabels(Canvas c, boolean drawDash) {
 
         if (!mYAxis.isEnabled() || !mYAxis.isDrawLabelsEnabled())
             return;

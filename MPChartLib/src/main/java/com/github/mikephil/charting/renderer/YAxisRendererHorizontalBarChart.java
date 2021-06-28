@@ -64,7 +64,7 @@ public class YAxisRendererHorizontalBarChart extends YAxisRenderer {
      * draws the y-axis labels to the screen
      */
     @Override
-    public void renderAxisLabels(Canvas c) {
+    public void renderAxisLabels(Canvas c, boolean drawDash) {
 
         if (!mYAxis.isEnabled() || !mYAxis.isDrawLabelsEnabled())
             return;
@@ -101,7 +101,7 @@ public class YAxisRendererHorizontalBarChart extends YAxisRenderer {
             }
         }
 
-        drawYLabels(c, yPos, positions, mYAxis.getYOffset());
+        drawYLabels(c, yPos, positions, mYAxis.getYOffset(), drawDash);
     }
 
     @Override
@@ -131,7 +131,7 @@ public class YAxisRendererHorizontalBarChart extends YAxisRenderer {
      * @param positions
      */
     @Override
-    protected void drawYLabels(Canvas c, float fixedPosition, float[] positions, float offset) {
+    protected void drawYLabels(Canvas c, float fixedPosition, float[] positions, float offset, boolean drawDash) {
 
         mAxisLabelPaint.setTypeface(mYAxis.getTypeface());
         mAxisLabelPaint.setTextSize(mYAxis.getTextSize());

@@ -264,7 +264,7 @@ public abstract class AxisRenderer extends Renderer {
      *
      * @param c
      */
-    public abstract void renderAxisLabels(Canvas c);
+    public abstract void renderAxisLabels(Canvas c, boolean drawDash);
 
     /**
      * Draws the grid lines belonging to the axis.

@@ -45,7 +45,7 @@ public class YAxisRenderer extends AxisRenderer {
      * draws the y-axis labels to the screen
      */
     @Override
-    public void renderAxisLabels(Canvas c) {
+    public void renderAxisLabels(Canvas c, boolean drawDash) {
 
         if (!mYAxis.isEnabled() || !mYAxis.isDrawLabelsEnabled())
             return;
@@ -85,7 +85,7 @@ public class YAxisRenderer extends AxisRenderer {
             }
         }
 
-        drawYLabels(c, xPos, positions, yoffset);
+        drawYLabels(c, xPos, positions, yoffset, drawDash);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class YAxisRenderer extends AxisRenderer {
      * @param fixedPosition
      * @param positions
      */
-    protected void drawYLabels(Canvas c, float fixedPosition, float[] positions, float offset) {
+    protected void drawYLabels(Canvas c, float fixedPosition, float[] positions, float offset, boolean drawDash) {
 
         final int from = mYAxis.isDrawBottomYLabelEntryEnabled() ? 0 : 1;
         final int to = mYAxis.isDrawTopYLabelEntryEnabled()
@@ -124,7 +124,7 @@ public class YAxisRenderer extends AxisRenderer {
 
             String text = mYAxis.getFormattedLabel(i);
 
-            c.drawText(text, fixedPosition, positions[i * 2 + 1] + offset, mAxisLabelPaint);
+            c.drawText(drawDash ? "-" : text, fixedPosition, positions[i * 2 + 1] + offset, mAxisLabelPaint);
         }
     }
 

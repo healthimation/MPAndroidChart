@@ -106,6 +106,8 @@ public abstract class DataSet<T extends Entry> extends BaseDataSet<T> {
         int indexFrom = getEntryIndex(fromX, Float.NaN, Rounding.DOWN);
         int indexTo = getEntryIndex(toX, Float.NaN, Rounding.UP);
 
+        if(indexFrom > indexTo) { return; }
+        
         for (int i = indexFrom; i <= indexTo; i++) {
 
             // only recalculate y

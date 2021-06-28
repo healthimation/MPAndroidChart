@@ -19,7 +19,7 @@ public class XAxisRendererRadarChart extends XAxisRenderer {
     }
 
     @Override
-    public void renderAxisLabels(Canvas c) {
+    public void renderAxisLabels(Canvas c, boolean drawDash) {
 
         if (!mXAxis.isEnabled() || !mXAxis.isDrawLabelsEnabled())
             return;

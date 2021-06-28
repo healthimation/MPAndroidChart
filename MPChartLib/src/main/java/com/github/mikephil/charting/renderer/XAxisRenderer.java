@@ -101,7 +101,7 @@ public class XAxisRenderer extends AxisRenderer {
     }
 
     @Override
-    public void renderAxisLabels(Canvas c) {
+    public void renderAxisLabels(Canvas c, boolean drawDash) {
 
         if (!mXAxis.isEnabled() || !mXAxis.isDrawLabelsEnabled())
             return;
