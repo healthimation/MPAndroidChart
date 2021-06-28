@@ -42,6 +42,9 @@ public abstract class AxisBase extends ComponentBase {
     public float[] mCenteredEntries = new float[]{};
 
     /**
+     * WARNING: This is done on purpose as an optimization of memory consumption.
+     * to allow reuse of arrays if they have at least needed size
+     * 
      * the number of entries the legend contains
      */
     public int mEntryCount;
