@@ -41,23 +41,12 @@ public class YAxisRenderer extends AxisRenderer {
         }
     }
 
-    /**
-     * draws the y-axis labels to the screen
-     */
-    @Override
-    public void renderAxisLabels(Canvas c) {
-
-        if (!mYAxis.isEnabled() || !mYAxis.isDrawLabelsEnabled())
-            return;
-
-        float[] positions = getTransformedPositions();
-
+    private float preparePaintAndGetXPos() {
         mAxisLabelPaint.setTypeface(mYAxis.getTypeface());
         mAxisLabelPaint.setTextSize(mYAxis.getTextSize());
         mAxisLabelPaint.setColor(mYAxis.getTextColor());
 
         float xoffset = mYAxis.getXOffset();
-        float yoffset = Utils.calcTextHeight(mAxisLabelPaint, "A") / 2.5f + mYAxis.getYOffset();
 
         AxisDependency dependency = mYAxis.getAxisDependency();
         YAxisLabelPosition labelPosition = mYAxis.getLabelPosition();
@@ -85,6 +74,33 @@ public class YAxisRenderer extends AxisRenderer {
             }
         }
 
+        return xPos;
+    }
+
+    public void renderDashedAxis(Canvas c, int numberOfDashes) {
+        if (!mYAxis.isEnabled() || !mYAxis.isDrawLabelsEnabled())
+            return;
+
+        float[] positions = getHandMadePositions(numberOfDashes);
+        float yoffset = Utils.calcTextHeight(mAxisLabelPaint, "A") / 2.5f + mYAxis.getYOffset();
+        float xPos = preparePaintAndGetXPos();
+
+        drawDashLabels(c, xPos, positions, yoffset);
+    }
+
+    /**
+     * draws the y-axis labels to the screen
+     */
+    @Override
+    public void renderAxisLabels(Canvas c) {
+
+        if (!mYAxis.isEnabled() || !mYAxis.isDrawLabelsEnabled())
+            return;
+
+        float[] positions = getTransformedPositions();
+        float yoffset = Utils.calcTextHeight(mAxisLabelPaint, "A") / 2.5f + mYAxis.getYOffset();
+        float xPos = preparePaintAndGetXPos();
+
         drawYLabels(c, xPos, positions, yoffset);
     }
 
@@ -103,6 +119,16 @@ public class YAxisRenderer extends AxisRenderer {
         } else {
             c.drawLine(mViewPortHandler.contentRight(), mViewPortHandler.contentTop(), mViewPortHandler.contentRight(),
                     mViewPortHandler.contentBottom(), mAxisLinePaint);
+        }
+    }
+
+    protected void drawDashLabels(Canvas c, float fixedPosition, float[] positions, float offset) {
+        final int from = 0;
+        final int to = positions.length / 2;
+
+        for (int i = from; i < to; i++) {
+
+            c.drawText("-", fixedPosition, positions[i * 2 + 1] + offset, mAxisLabelPaint);
         }
     }
 
@@ -187,6 +213,28 @@ public class YAxisRenderer extends AxisRenderer {
         p.lineTo(mViewPortHandler.contentRight(), positions[i + 1]);
 
         return p;
+    }
+
+    protected float[] mGetHandMadePositionsBuffer = new float[2];
+
+    protected float[] getHandMadePositions(int numberOfDashes) {
+
+        if(mGetHandMadePositionsBuffer.length != numberOfDashes * 2){
+            mGetHandMadePositionsBuffer = new float[numberOfDashes * 2];
+        }
+        float[] positions = mGetHandMadePositionsBuffer;
+
+        float top = mViewPortHandler.contentTop();
+        float bottom = mViewPortHandler.contentBottom();
+        float range = Math.abs(Math.abs(top) - Math.abs(bottom));
+        float intervalInPixels = range / (numberOfDashes - 1);
+
+        for (int i = 0; i < positions.length; i += 2) {
+            // only fill y values, x values are not needed for y-labels
+            positions[i + 1] = top + (i / 2) * intervalInPixels;
+        }
+
+        return positions;
     }
 
     protected float[] mGetTransformedPositionsBuffer = new float[2];
