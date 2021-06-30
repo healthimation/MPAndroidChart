@@ -68,7 +68,8 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
      * flag that indicates if auto scaling on the y axis is enabled
      */
     protected boolean mAutoScaleMinMaxEnabled = false;
-
+    protected boolean mAllowDashesWhenChartIsEmpty = false;
+    protected int mAmountOfDashes = 6;
     /**
      * 
      */
@@ -219,6 +220,16 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
         long starttime = System.currentTimeMillis();
 
+        boolean hasDataVisible = false;
+        for(int i = 0; i < mData.getDataSets().size(); i++) {
+
+            IDataSet set = mData.getDataSets().get(i);
+            if(set.containsEntriesAtXValue(getLowestVisibleX(), getHighestVisibleX())) {
+                hasDataVisible = true;
+                break;
+            }
+        }
+
         // execute all drawing commands
         drawGridBackground(canvas);
 
@@ -293,7 +304,16 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
         mXAxisRenderer.renderAxisLabels(canvas);
         mAxisRendererLeft.renderAxisLabels(canvas);
-        mAxisRendererRight.renderAxisLabels(canvas);
+        // TODO: add support for left axis
+        if(mAutoScaleMinMaxEnabled && mAllowDashesWhenChartIsEmpty) {
+            if(hasDataVisible) {
+                mAxisRendererRight.renderAxisLabels(canvas);
+            } else {
+                mAxisRendererRight.renderDashedAxis(canvas, mAmountOfDashes);
+            }
+        } else {
+            mAxisRendererRight.renderAxisLabels(canvas);
+        }
 
         if (isClipValuesToContentEnabled()) {
             clipRestoreCount = canvas.save();
@@ -392,15 +412,6 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         mXAxis.calculate(mData.getXMin(), mData.getXMax());
 
         // calculate axis range (min / max) according to provided data
-
-        // if (mAxisLeft.isEnabled())
-        //     mAxisLeft.calculate(mData.getYMin(AxisDependency.LEFT),
-        //             mData.getYMax(AxisDependency.LEFT));
-
-        // if (mAxisRight.isEnabled())
-        //     mAxisRight.calculate(mData.getYMin(AxisDependency.RIGHT),
-        //             mData.getYMax(AxisDependency.RIGHT));
-
         mAxisLeft.calculate(mData.getYMin(AxisDependency.LEFT), mData.getYMax(AxisDependency.LEFT));
         mAxisRight.calculate(mData.getYMin(AxisDependency.RIGHT), mData.getYMax(AxisDependency.RIGHT));
 
@@ -1612,6 +1623,14 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         mAutoScaleMinMaxEnabled = enabled;
     }
 
+    public void setAmountOfDashes(int count) {
+        mAmountOfDashes = count;
+    }
+
+    public void setAllowDashesWhenChartIsEmpty(boolean enabled) {
+        mAllowDashesWhenChartIsEmpty = enabled;
+    }
+
     public void setEnlargeEntryOnHighlightEnabled(boolean enabled) {
         mEnlargeEntryOnHighlightEnabled = enabled;
     }
@@ -1666,6 +1685,14 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
      */
     public boolean isAutoScaleMinMaxEnabled() {
         return mAutoScaleMinMaxEnabled;
+    }
+
+    public boolean isAllowDashesWhenChartIsEmptyEnabled() {
+        return mAllowDashesWhenChartIsEmpty;
+    }
+
+    public int getAmountOfDashes() {
+        return mAmountOfDashes;
     }
 
     @Override
