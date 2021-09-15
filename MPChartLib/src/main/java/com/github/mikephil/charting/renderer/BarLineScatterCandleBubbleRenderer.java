@@ -58,6 +58,9 @@ public abstract class BarLineScatterCandleBubbleRenderer extends DataRenderer {
         }
     }
 
+    @Override
+    public void drawTargetValue(Canvas c) {}
+
     /**
      * Class representing the bounds of the current viewport in terms of indices in the values array of a DataSet.
      */

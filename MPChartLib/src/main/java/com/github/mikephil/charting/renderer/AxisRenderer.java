@@ -266,6 +266,8 @@ public abstract class AxisRenderer extends Renderer {
      */
     public abstract void renderAxisLabels(Canvas c);
 
+    public abstract void renderTargetValue(Canvas c, float value);
+
     /**
      * Draws the grid lines belonging to the axis.
      *

@@ -273,6 +273,11 @@ public class XAxisRenderer extends AxisRenderer {
         return mGridClippingRect;
     }
 
+    @Override
+    public void renderTargetValue(Canvas c, float value) {
+        
+    }
+
     /**
      * Draws the grid line at the specified position using the provided path.
      *

@@ -77,6 +77,9 @@ public class YAxisRenderer extends AxisRenderer {
         return xPos;
     }
 
+    /**
+     * Draws Y Axis with dashed instead of values
+     */
     public void renderDashedAxis(Canvas c, int numberOfDashes) {
         if (!mYAxis.isEnabled() || !mYAxis.isDrawLabelsEnabled())
             return;
@@ -152,6 +155,35 @@ public class YAxisRenderer extends AxisRenderer {
 
             c.drawText(text, fixedPosition, positions[i * 2 + 1] + offset, mAxisLabelPaint);
         }
+    }
+
+    @Override
+    public void renderTargetValue(Canvas c, float value) {
+        if (!mYAxis.isEnabled() || !mYAxis.isDrawLabelsEnabled())
+            return;
+
+        // x is 0 index - maybe it can be omitted (requires testing)
+        float[] positions = new float[]{ 0, value };
+        mTrans.pointValuesToPixel(positions);
+        String text = mYAxis.getValueFormatter().getAxisLabel(value, mYAxis);
+
+        float textHeight = Utils.calcTextHeight(mAxisLabelPaint, "A") / 1.f;
+        float textWidth = Utils.calcTextWidth(mAxisLabelPaint, text) / 1.f;
+
+        float yoffset = Utils.calcTextHeight(mAxisLabelPaint, "A") / 2.5f + mYAxis.getYOffset();
+        float xPos = preparePaintAndGetXPos();
+
+        // 1 index is Y coord
+        float yPos = positions[1] + yoffset;
+
+        float padding = mYAxis.getTargetBackgroundPadding();
+        float roundingRadius = mYAxis.getTargetBackgroundRadius();
+
+        mAxisLabelPaint.setColor(mYAxis.getTargetBackgroundColor());
+        c.drawRoundRect(xPos - padding, yPos - textHeight - padding, xPos + textWidth + padding, yPos + padding, roundingRadius, roundingRadius, mAxisLabelPaint);
+        
+        mAxisLabelPaint.setColor(mYAxis.getTargetTextColor());
+        c.drawText(text, xPos, yPos, mAxisLabelPaint);
     }
 
     protected Path mRenderGridLinesPath = new Path();

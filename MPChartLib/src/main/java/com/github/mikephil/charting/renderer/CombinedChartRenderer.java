@@ -88,6 +88,9 @@ public class CombinedChartRenderer extends DataRenderer {
         for (DataRenderer renderer : mRenderers)
             renderer.drawData(c);
     }
+    
+    @Override
+    public void drawTargetValue(Canvas c) {}
 
     @Override
     public void drawValue(Canvas c, String valueText, float x, float y, int color) {
