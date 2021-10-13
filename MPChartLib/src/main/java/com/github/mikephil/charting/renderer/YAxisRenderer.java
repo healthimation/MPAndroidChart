@@ -219,12 +219,6 @@ public class YAxisRenderer extends AxisRenderer {
 
         // 1 index is Y coord
         float yPos = positions[1] + yoffset;
-
-        float padding = mYAxis.getTargetBackgroundPadding();
-        float roundingRadius = mYAxis.getTargetBackgroundRadius();
-
-        mAxisLabelPaint.setColor(mYAxis.getTargetBackgroundColor());
-        c.drawRoundRect(xPos - padding, yPos - textHeight - padding, xPos + textWidth + padding, yPos + padding, roundingRadius, roundingRadius, mAxisLabelPaint);
         
         mAxisLabelPaint.setColor(mYAxis.getTargetTextColor());
         c.drawText(text, xPos, yPos, mAxisLabelPaint);
