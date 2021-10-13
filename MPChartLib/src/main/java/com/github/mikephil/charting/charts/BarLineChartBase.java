@@ -323,17 +323,21 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         // TODO: add support for left axis
         if(mAutoScaleMinMaxEnabled && mAllowDashesWhenChartIsEmpty) {
             if(hasDataVisible) {
-                mAxisRendererRight.renderAxisLabels(canvas);
                 if(mShowingTargetEnabled) {
+                    mAxisRendererRight.renderAxisLabelsWithSpaceForTarget(canvas, mTargetValue);
                     mAxisRendererRight.renderTargetValue(canvas, mTargetValue);
+                } else {
+                    mAxisRendererRight.renderAxisLabels(canvas);
                 }
             } else {
                 mAxisRendererRight.renderDashedAxis(canvas, mAmountOfDashes);
             }
         } else {
-            mAxisRendererRight.renderAxisLabels(canvas);
             if(mShowingTargetEnabled) {
+                mAxisRendererRight.renderAxisLabelsWithSpaceForTarget(canvas, mTargetValue);
                 mAxisRendererRight.renderTargetValue(canvas, mTargetValue);
+            } else {
+                mAxisRendererRight.renderAxisLabels(canvas);
             }
         }
 

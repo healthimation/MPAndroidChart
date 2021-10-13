@@ -101,7 +101,7 @@ public class YAxisRendererHorizontalBarChart extends YAxisRenderer {
             }
         }
 
-        drawYLabels(c, yPos, positions, mYAxis.getYOffset());
+        drawYLabels(c, yPos, positions, mYAxis.getYOffset(), new Integer[]{});
     }
 
     @Override
@@ -131,7 +131,7 @@ public class YAxisRendererHorizontalBarChart extends YAxisRenderer {
      * @param positions
      */
     @Override
-    protected void drawYLabels(Canvas c, float fixedPosition, float[] positions, float offset) {
+    protected void drawYLabels(Canvas c, float fixedPosition, float[] positions, float offset, Integer[] indexesToSkip) {
 
         mAxisLabelPaint.setTypeface(mYAxis.getTypeface());
         mAxisLabelPaint.setTextSize(mYAxis.getTextSize());

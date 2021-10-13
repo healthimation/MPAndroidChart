@@ -17,6 +17,8 @@ import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
 
 public class YAxisRenderer extends AxisRenderer {
 
@@ -104,7 +106,43 @@ public class YAxisRenderer extends AxisRenderer {
         float yoffset = Utils.calcTextHeight(mAxisLabelPaint, "A") / 2.5f + mYAxis.getYOffset();
         float xPos = preparePaintAndGetXPos();
 
-        drawYLabels(c, xPos, positions, yoffset);
+        drawYLabels(c, xPos, positions, yoffset, new Integer[]{});
+    }
+
+    public void renderAxisLabelsWithSpaceForTarget(Canvas c, float targetValue) {
+
+        if (!mYAxis.isEnabled() || !mYAxis.isDrawLabelsEnabled())
+            return;
+
+        float[] positions = getTransformedPositions();
+        float yoffset = Utils.calcTextHeight(mAxisLabelPaint, "A") / 2.5f + mYAxis.getYOffset();
+        float xPos = preparePaintAndGetXPos();
+
+        float[] targetPositionArray = new float[]{ 0, targetValue };
+        mTrans.pointValuesToPixel(targetPositionArray);
+
+        float targetPosition = targetPositionArray[1];
+        float halfHeight = (Utils.calcTextHeight(mAxisLabelPaint, "A") / 2f)*1.1f;
+        Integer[] indexesToSkip = getIndexesOfOverlappingPositions(positions, halfHeight, targetPosition);
+
+        drawYLabels(c, xPos, positions, yoffset, indexesToSkip);
+    }
+
+    /**
+     * Gets indexes of positions of y axis labels overlapping a target label to get rid of them later from Y axis
+     * halfHeight is a half of a space needed for drawing a label
+     */
+    public Integer[] getIndexesOfOverlappingPositions(float[] positions, float halfHeight, float yPosition) {
+        List<Integer> list = new ArrayList<Integer>();
+
+        for(int i = 0; i < positions.length/2; i++) {
+            if(positions[i*2 + 1] - 2*halfHeight <= yPosition && yPosition <= positions[i*2 + 1] + 2*halfHeight) {
+                list.add(i);
+            }
+        }
+
+        Integer[] array = list.toArray(new Integer[0]);
+        return array;
     }
 
     @Override
@@ -140,16 +178,22 @@ public class YAxisRenderer extends AxisRenderer {
      *
      * @param fixedPosition
      * @param positions
+     * @param indexesToSkip indexes of positions that we dont want to draw
      */
-    protected void drawYLabels(Canvas c, float fixedPosition, float[] positions, float offset) {
+    protected void drawYLabels(Canvas c, float fixedPosition, float[] positions, float offset, Integer[] indexesToSkip) {
 
         final int from = mYAxis.isDrawBottomYLabelEntryEnabled() ? 0 : 1;
         final int to = mYAxis.isDrawTopYLabelEntryEnabled()
                 ? mYAxis.mEntryCount
                 : (mYAxis.mEntryCount - 1);
 
+        List<Integer> list = Arrays.asList(indexesToSkip);
         // draw
         for (int i = from; i < to; i++) {
+
+            if(list.contains(i)) {
+                continue;
+            }
 
             String text = mYAxis.getFormattedLabel(i);
 
