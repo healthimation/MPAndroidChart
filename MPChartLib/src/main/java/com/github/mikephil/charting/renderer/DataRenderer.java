@@ -35,6 +35,8 @@ public abstract class DataRenderer extends Renderer {
      */
     protected Paint mHighlightPaint;
 
+    protected Paint mTargetValuePaint;
+
     protected Paint mDrawPaint;
 
     /**
@@ -61,6 +63,11 @@ public abstract class DataRenderer extends Renderer {
         mHighlightPaint.setStyle(Paint.Style.STROKE);
         mHighlightPaint.setStrokeWidth(2f);
         mHighlightPaint.setColor(Color.rgb(255, 187, 115));
+
+        mTargetValuePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mTargetValuePaint.setStyle(Paint.Style.STROKE);
+        mTargetValuePaint.setStrokeWidth(2f);
+        mTargetValuePaint.setColor(Color.rgb(255, 12, 115));
     }
 
     protected boolean isDrawingValuesAllowed(ChartInterface chart) {
@@ -129,6 +136,13 @@ public abstract class DataRenderer extends Renderer {
      * @param c
      */
     public abstract void drawValues(Canvas c);
+
+    /**
+     * Draws target value.
+     *
+     * @param c
+     */
+    public abstract void drawTargetValue(Canvas c);
 
     /**
      * Draws the value of the given entry by using the provided IValueFormatter.

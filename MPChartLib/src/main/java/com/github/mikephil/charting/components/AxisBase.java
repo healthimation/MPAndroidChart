@@ -61,6 +61,12 @@ public abstract class AxisBase extends ComponentBase {
      */
     protected float mGranularity = 1.0f;
 
+    /** For both line and text background */
+    protected int mTargetTextColor = Color.BLACK;
+    protected int mTargetBackgroundColor = Color.GREEN;
+    protected float mTargetBackgroundPadding = 5.0f;
+    protected float mTargetBackgroundRadius = 5.0f;
+
     /**
      * When true, axis labels are controlled by the `granularity` property.
      * When false, axis values could possibly be repeated.
@@ -543,6 +549,38 @@ public abstract class AxisBase extends ComponentBase {
         mGridDashPathEffect = new DashPathEffect(new float[]{
                 lineLength, spaceLength
         }, phase);
+    }
+
+    /**
+     * Sets props for target value
+     * [3.4k] to be drawn on an axis
+     *
+     * @param textColor  color of text inside
+     * @param backgroundColor background color
+     * @param backgroundPadding padding in background badge
+     * @param backgroundRadius radius of corners
+     */
+    public void setTargetProps(int textColor, int backgroundColor, float backgroundPadding, float backgroundRadius) {
+        mTargetTextColor = textColor;
+        mTargetBackgroundColor = backgroundColor;
+        mTargetBackgroundPadding = backgroundPadding;
+        mTargetBackgroundRadius = backgroundRadius;
+    }
+
+    public int getTargetTextColor(){
+        return mTargetTextColor;
+    }
+
+    public int getTargetBackgroundColor(){
+        return mTargetBackgroundColor;
+    }
+
+    public float getTargetBackgroundPadding(){
+        return mTargetBackgroundPadding;
+    }
+
+    public float getTargetBackgroundRadius(){
+        return mTargetBackgroundRadius;
     }
 
     /**

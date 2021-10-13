@@ -8,4 +8,9 @@ public interface BarLineChartInterface extends BarLineScatterCandleBubbleDataPro
     float getEnlargementScaleForHighlightedEntry();
     float getDecreaseScaleForUnhighlightedEntry();
     int getDimmingAlpha();
+
+    float getTargetValue();
+    boolean isTargetEnabled();
+    int getTargetLineColor();
+    float getTargetLineWidth();
 }

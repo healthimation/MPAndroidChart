@@ -85,6 +85,13 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
     protected int mDimmingAlpha = 120;
 
+    /** TARGET VALUE props */
+    protected float mTargetValue = 3500f;
+    protected boolean mShowingTargetEnabled = false;
+    protected float mTargetLineWidth = 2.0f;
+    protected int mTargetLineColor = Color.GREEN;
+    /** TARGET VALUE props END */
+
     /**
      * flag that indicates if pinch-zoom is enabled. if true, both x and y axis
      * can be scaled with 2 fingers, if false, x and y axis can be scaled
@@ -272,6 +279,15 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         int clipRestoreCount = canvas.save();
         canvas.clipRect(mViewPortHandler.getContentRect());
 
+
+        // Maybe we should add support not only for our use-case
+        // It's could be useful also to draw target line even if there is no data visible
+        // for now i'm leaving it as is
+
+        // Drawn here because we wanted the line to be under data points
+        if(hasDataVisible && mShowingTargetEnabled) {
+            mRenderer.drawTargetValue(canvas);
+        }
         mRenderer.drawData(canvas);
 
         if (!mXAxis.isDrawGridLinesBehindDataEnabled())
@@ -307,12 +323,22 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
         // TODO: add support for left axis
         if(mAutoScaleMinMaxEnabled && mAllowDashesWhenChartIsEmpty) {
             if(hasDataVisible) {
-                mAxisRendererRight.renderAxisLabels(canvas);
+                if(mShowingTargetEnabled) {
+                    mAxisRendererRight.renderAxisLabelsWithSpaceForTarget(canvas, mTargetValue);
+                    mAxisRendererRight.renderTargetValue(canvas, mTargetValue);
+                } else {
+                    mAxisRendererRight.renderAxisLabels(canvas);
+                }
             } else {
                 mAxisRendererRight.renderDashedAxis(canvas, mAmountOfDashes);
             }
         } else {
-            mAxisRendererRight.renderAxisLabels(canvas);
+            if(mShowingTargetEnabled) {
+                mAxisRendererRight.renderAxisLabelsWithSpaceForTarget(canvas, mTargetValue);
+                mAxisRendererRight.renderTargetValue(canvas, mTargetValue);
+            } else {
+                mAxisRendererRight.renderAxisLabels(canvas);
+            }
         }
 
         if (isClipValuesToContentEnabled()) {
@@ -1661,6 +1687,38 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleBubbleData<
 
     public int getDimmingAlpha() {
         return mDimmingAlpha;
+    }
+
+    public void setTargetValue(float target) {
+        mTargetValue = target;
+    }
+
+    public float getTargetValue() {
+        return mTargetValue;
+    }
+
+    public void setTargetLineColor(int color) {
+        mTargetLineColor = color;
+    }
+
+    public int getTargetLineColor() {
+        return mTargetLineColor;
+    }
+
+    public void setTargetLineWidth(float width) {
+        mTargetLineWidth = width;
+    }
+
+    public float getTargetLineWidth() {
+        return mTargetLineWidth;
+    }
+
+    public void setTargetEnabled(boolean enabled) {
+        mShowingTargetEnabled = enabled;
+    }
+
+    public boolean isTargetEnabled() {
+        return mShowingTargetEnabled;
     }
 
     public void setDimmingEnabled(boolean enabled) {

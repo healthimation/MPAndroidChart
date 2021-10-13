@@ -24,6 +24,7 @@ import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.github.mikephil.charting.model.GradientColor;
+import com.github.mikephil.charting.components.YAxis.AxisDependency;
 
 import java.util.List;
 
@@ -627,6 +628,16 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                 drawHighlightArrow(c, (float) pix.x, (float) pix.y, set, 2f);
             }
         }
+    }
+
+    @Override
+    public void drawTargetValue(Canvas c) {
+        MPPointD pix = mChart.getTransformer(AxisDependency.RIGHT).getPixelForValues(0.f, mChart.getTargetValue() * mAnimator
+                        .getPhaseY());
+
+        mTargetValuePaint.setColor(mChart.getTargetLineColor());
+        mTargetValuePaint.setStrokeWidth(mChart.getTargetLineWidth());
+        c.drawLine(mViewPortHandler.contentLeft(), (float) pix.y, mViewPortHandler.contentRight(), (float) pix.y, mTargetValuePaint);
     }
 
     /**
